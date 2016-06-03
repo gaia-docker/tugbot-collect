@@ -9,7 +9,7 @@ dependencies:
     # create builder image
     - docker build -t tugbot-collect/builder -f Build.Dockerfile .
     # compile tugbot-collect binary (linux/amd64)
-    - docker run --rm -v "$PWD":/go/src/github.com/gaia-docker/tugbot-collect -w /go/src/github.com/gaia-docker/tugbot-collect tugbot-collect/builder script/go_build.sh
+    - docker run --rm -v "$PWD":/go/src/github.com/gaia-docker/tugbot-collect -w /go/src/github.com/gaia-docker/tugbot-collect tugbot-collect/builder scripts/go_build.sh
     # create tugbot-collect Docker image too
     - docker build -t gaiadocker/tugbot-collect .
     - docker tag gaiadocker/tugbot-collect gaiadocker/tugbot-collect:$CIRCLE_BUILD_NUM-$CIRCLE_BRANCH
