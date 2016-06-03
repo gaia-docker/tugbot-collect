@@ -1,0 +1,46 @@
+machine:
+  pre:
+    - sudo curl -L -o /usr/bin/docker 'https://s3-external-1.amazonaws.com/circle-downloads/docker-1.9.1-circleci'
+    - sudo chmod 0755 /usr/bin/docker
+  services:
+    - docker
+dependencies:
+  override:
+    # create builder image
+    - docker build -t tugbot-collect/builder -f Build.Dockerfile .
+    # compile tugbot-collect binary (linux/amd64)
+    - docker run --rm -v "$PWD":/go/src/github.com/gaia-docker/tugbot-collect -w /go/src/github.com/gaia-docker/tugbot-collect tugbot-collect/builder script/go_build.sh
+    # create tugbot-collect Docker image too
+    - docker build -t gaiadocker/tugbot-collect .
+    - docker tag gaiadocker/tugbot-collect gaiadocker/tugbot-collect:$CIRCLE_BUILD_NUM-$CIRCLE_BRANCH
+    - docker tag gaiadocker/tugbot-collect gaiadocker/tugbot-collect:$CIRCLE_BRANCH
+#test:
+#  override:
+    # run tests for all Pumba packages (exl. vendor), calculate coverage and generate junit.xml reports
+#    - docker run --rm -e "COVERALLS_TOKEN=${COVERALLS_TOKEN}" -v "$PWD":/go/src/github.com/gaia-adm/pumba -w /go/src/github.com/gaia-adm/pumba pumba/builder script/coverage.sh --coveralls
+#  post:
+    # copy test results
+#    - cp .cover/*_tests.xml $CIRCLE_TEST_REPORTS
+deployment:
+  continuous:
+    branch: [master, develop, /feature_.*/]
+    commands:
+      # deply image to DockerHub
+      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+      - docker push gaiadocker/tugbot-collect
+#  github:
+#    branch: master
+#    commands:
+      # deploy image to DockerHub
+#      - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
+#      - docker push gaiaadm/pumba
+      # cross compile Pumba for multiple platforms
+#      - docker run --rm -v "$PWD":/go/src/github.com/gaia-adm/pumba -w /go/src/github.com/gaia-adm/pumba pumba/builder script/gox_build.sh
+      # publish new release to GitHub
+#      - docker run --rm -e "GITHUB_TOKEN=${GITHUB_TOKEN}" -e "RELEASE_TAG=${RELEASE_TAG}" -v "$PWD":/go/src/github.com/gaia-adm/pumba -w /go/src/github.com/gaia-adm/pumba pumba/builder script/github_release.sh $CIRCLE_PROJECT_USERNAME $CIRCLE_PROJECT_REPONAME
+notify:
+  webhooks:
+    - url: http://beta.gaiahub.io:88/wh/5a866f9b-98c9-438d-a8d4-53cf4ae9599c/4c310c8e220ee9bead74eece42ce0e109fd3535e
+general:
+  artifacts:
+    - .dist
