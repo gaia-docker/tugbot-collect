@@ -2,7 +2,7 @@ FROM golang:1.6.2-alpine
 
 MAINTAINER Shay Tsadok <shayts7@gmail.com>
 
-ADD . /go/src/github.com/gaia-docker/
+ADD . /go/src/github.com/gaia-docker/tugbot-collect
 
 # install Git apk
 RUN apk --update add git bash \
