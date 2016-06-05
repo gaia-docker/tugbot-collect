@@ -14,8 +14,9 @@ dependencies:
     - docker build -t gaiadocker/tugbot-collect .
     - docker tag gaiadocker/tugbot-collect gaiadocker/tugbot-collect:$CIRCLE_BUILD_NUM-$CIRCLE_BRANCH
     - docker tag gaiadocker/tugbot-collect gaiadocker/tugbot-collect:$CIRCLE_BRANCH
-#test:
-#  override:
+test:
+  override:
+    - echo "no tests for now"
     # run tests for all Pumba packages (exl. vendor), calculate coverage and generate junit.xml reports
 #    - docker run --rm -e "COVERALLS_TOKEN=${COVERALLS_TOKEN}" -v "$PWD":/go/src/github.com/gaia-adm/pumba -w /go/src/github.com/gaia-adm/pumba pumba/builder script/coverage.sh --coveralls
 #  post:
