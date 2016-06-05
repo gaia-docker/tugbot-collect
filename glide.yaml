@@ -1,2 +1,5 @@
 package: github.com/gaia-docker/tugbot-collect
-import: []
+import:
+- package: github.com/docker/engine-api
+  subpackages:
+  - client

@@ -1,4 +1,58 @@
-hash: fbd8c9aeaf0125c5e52d6c753d474ae741938e2c0e255367cd7adee21d2e7892
-updated: 2016-06-03T14:35:38.9181484+03:00
-imports: []
+hash: 0e94dff63bb02406da7269a32997151324555b483e883d94f7d3a3458ceb107c
+updated: 2016-06-05T22:59:31.6067137+03:00
+imports:
+- name: github.com/docker/distribution
+  version: feddf6cd4e439577ab270d8e3ba63a5d7c5c0d55
+  subpackages:
+  - github.com\docker\distribution\reference
+  - github.com\docker\distribution\digest
+- name: github.com/docker/engine-api
+  version: 8f30a1c59bd2bcd1f198ef8b077a8785615ea648
+  subpackages:
+  - client
+  - github.com\docker\engine-api\client
+  - github.com\docker\engine-api\types
+  - github.com\docker\engine-api\client\transport
+  - github.com\docker\engine-api\client\transport\cancellable
+  - github.com\docker\engine-api\types\container
+  - github.com\docker\engine-api\types\filters
+  - github.com\docker\engine-api\types\network
+  - github.com\docker\engine-api\types\reference
+  - github.com\docker\engine-api\types\registry
+  - github.com\docker\engine-api\types\time
+  - github.com\docker\engine-api\types\blkiodev
+  - github.com\docker\engine-api\types\strslice
+  - github.com\docker\engine-api\types\versions
+- name: github.com/docker/go-connections
+  version: c7838b258fbfa3fe88eecfb2a0e08ea0dbd6a646
+  subpackages:
+  - github.com\docker\go-connections\sockets
+  - github.com\docker\go-connections\tlsconfig
+  - github.com\docker\go-connections\nat
+- name: github.com/docker/go-units
+  version: 09dda9d4b0d748c57c14048906d3d094a58ec0c9
+  subpackages:
+  - github.com\docker\go-units
+- name: github.com/Microsoft/go-winio
+  version: 4f1a71750d95a5a8a46c40a67ffbed8129c2f138
+  subpackages:
+  - github.com\Microsoft\go-winio
+- name: github.com/opencontainers/runc
+  version: afaa21f79ade3b2e99a68f3f15e7219155aa4662
+  subpackages:
+  - github.com\opencontainers\runc\libcontainer\user
+- name: github.com/Sirupsen/logrus
+  version: 55eb11d21d2a31a3cc93838241d04800f52e823d
+  subpackages:
+  - formatters/logstash
+  - github.com\Sirupsen\logrus
+- name: golang.org/x/net
+  version: 4876518f9e71663000c348837735820161a42df7
+  subpackages:
+  - golang.org\x\net\context
+  - golang.org\x\net\proxy
+- name: golang.org/x/sys
+  version: 076b546753157f758b316e59bcb51e6807c04057
+  subpackages:
+  - golang.org\x\sys\windows
 devImports: []

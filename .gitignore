@@ -2,4 +2,7 @@
 .cover
 .dist
 .idea
+tugbot-collect.iml
+tugbot-collect.exe
+container_settings.json
 vendor
