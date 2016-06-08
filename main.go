@@ -21,6 +21,6 @@ func main() {
 	}
 
 	for _, c := range containers {
-		fmt.Println(c.ID)
+		fmt.Println(c.Image, "-> ", c.ID)
 	}
 }
