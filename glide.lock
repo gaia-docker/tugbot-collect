@@ -1,5 +1,5 @@
 hash: 0e94dff63bb02406da7269a32997151324555b483e883d94f7d3a3458ceb107c
-updated: 2016-06-05T22:59:31.6067137+03:00
+updated: 2016-06-08T14:54:34.1410848+03:00
 imports:
 - name: github.com/docker/distribution
   version: feddf6cd4e439577ab270d8e3ba63a5d7c5c0d55
@@ -7,7 +7,7 @@ imports:
   - github.com\docker\distribution\reference
   - github.com\docker\distribution\digest
 - name: github.com/docker/engine-api
-  version: 8f30a1c59bd2bcd1f198ef8b077a8785615ea648
+  version: 3a30f2268c92f10db8c748c441f362f4938ccd2f
   subpackages:
   - client
   - github.com\docker\engine-api\client
@@ -23,8 +23,9 @@ imports:
   - github.com\docker\engine-api\types\blkiodev
   - github.com\docker\engine-api\types\strslice
   - github.com\docker\engine-api\types\versions
+  - github.com\docker\engine-api\types\events
 - name: github.com/docker/go-connections
-  version: c7838b258fbfa3fe88eecfb2a0e08ea0dbd6a646
+  version: 990a1a1a70b0da4c4cb70e117971a4f0babfbf1a
   subpackages:
   - github.com\docker\go-connections\sockets
   - github.com\docker\go-connections\tlsconfig
@@ -38,7 +39,7 @@ imports:
   subpackages:
   - github.com\Microsoft\go-winio
 - name: github.com/opencontainers/runc
-  version: afaa21f79ade3b2e99a68f3f15e7219155aa4662
+  version: e34cb45a49beb83ababfa32df43b8e7e27f0ac51
   subpackages:
   - github.com\opencontainers\runc\libcontainer\user
 - name: github.com/Sirupsen/logrus
@@ -46,6 +47,10 @@ imports:
   subpackages:
   - formatters/logstash
   - github.com\Sirupsen\logrus
+- name: github.com/vdemeester/docker-events
+  version: 20e6d2db238723e68197a9e3c6c34c99a9893a9c
+  subpackages:
+  - github.com\vdemeester\docker-events
 - name: golang.org/x/net
   version: 4876518f9e71663000c348837735820161a42df7
   subpackages:
