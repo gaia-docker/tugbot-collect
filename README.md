@@ -24,6 +24,4 @@ By default, tugbot-collect will:
   - Try to extract the container's stdout.
   
   - Save all to the `output directory` (by default `/var/logs/tugbot-collect/`) under a unique folder (folder name will be composed of `image name`-`time`-`short container id`).
-  
-  - `docker rm` the container.
 
