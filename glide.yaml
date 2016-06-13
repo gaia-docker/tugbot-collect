@@ -3,3 +3,4 @@ import:
 - package: github.com/docker/engine-api
   subpackages:
   - client
+- package: github.com/urfave/cli

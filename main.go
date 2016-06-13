@@ -10,9 +10,50 @@ import (
 	"os"
 	"bufio"
 	"io"
+	"github.com/urfave/cli"
 )
 
 func main() {
+	var dockerrm bool
+	var scanonstartup bool
+	var skipevents bool
+	var outputdir string
+
+	app := cli.NewApp()
+	app.Version = "1.0.0"
+	app.Flags = []cli.Flag {
+		cli.StringFlag{
+			Name:        "outputdir, o",
+			Value:       "/var/logs/tugbot-collect",
+			Usage:       "write results to `DIR_LOCATION`, if you want not to output results set this flag with the directory '/dev/null'",
+			Destination: &outputdir,
+		},
+		cli.BoolFlag{
+			Name:        "scanonstartup, e",
+			Usage:       "scan for existed containers on startup and extract their results",
+			Destination: &scanonstartup,
+		},
+		cli.BoolFlag{
+			Name:        "dockerrm, d",
+			Usage:       "remove the container after extracting results",
+			Destination: &dockerrm,
+		},
+		cli.BoolFlag{
+			Name:        "skipevents, s",
+			Usage:       "do not register to docker 'die' event",
+			Destination: &skipevents,
+		},
+	}
+
+	app.Name = "tugbot-collect"
+	app.Usage = "Collects result from test containers"
+	app.Action = func(c *cli.Context) error {
+		fmt.Println("tugbot-collect is going to work with these flags - dockerrm: ", dockerrm, ",scanonstartup: ", scanonstartup, ",skipevents: ", skipevents,",outputdir: ", outputdir)
+		return nil
+	}
+
+	app.Run(os.Args)
+
 	defaultHeaders := map[string]string{"User-Agent": "engine-api-cli-1.0"}
 	cli, err := client.NewClient("unix:///var/run/docker.sock", "v1.22", nil, defaultHeaders)
 	if err != nil {
