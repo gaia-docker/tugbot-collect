@@ -1,16 +1,11 @@
 # tugbot-collect
 collects test results from test containers and save the results to disk
 
-## Docker run command
-
-```
-docker run -d -v /var/run/docker.sock:/var/run/docker.sock gaiadocker/tugbot-collect
-```
-
 ## Usage
 
 ```
-./tugbot-collect --help
+docker run -it -v /var/run/docker.sock:/var/run/docker.sock gaiadocker/tugbot-collect tugbot-collect -h
+
 NAME:
    tugbot-collect - Collects result from test containers (use TC_LOG_LEVEL env var to change the default which is debug
 
@@ -31,3 +26,13 @@ GLOBAL OPTIONS:
    --help, -h                                 show help
    --version, -v                              print the version
 ```
+
+# Addtional notes
+- If you want to use tubgot-collect default settings, this should be enough:
+`docker run -d -v /var/run/docker.sock:/var/run/docker.sock gaiadocker/tugbot-collect`
+- If you want to write the results to a disk on the host, you should add volume mapping, for example:
+`docker run -d -v /var/run/docker.sock:/var/run/docker.sock -v /tmp/tugbot-collect:/tmp/tugbot-collect gaiadocker/tugbot-collect`
+- To change log level (which is debug by default), use this for exmaple: 
+`docker run -d -v /var/run/docker.sock:/var/run/docker.sock -e TS_LOG_LEVEL=warn gaiadocker/tugbot-collect`
+- To pass flag to tugbot-collect, use this for example:
+`docker run -d -v /var/run/docker.sock:/var/run/docker.sock gaiadocker/tugbot-collect tugbot-collect -e -d`
