@@ -36,3 +36,8 @@ GLOBAL OPTIONS:
 `docker run -d -v /var/run/docker.sock:/var/run/docker.sock -e TS_LOG_LEVEL=warn gaiadocker/tugbot-collect`
 - To pass flag to tugbot-collect, use this for example:
 `docker run -d -v /var/run/docker.sock:/var/run/docker.sock gaiadocker/tugbot-collect tugbot-collect -e -d`
+
+## Missions to complete
+- Integrate with result service
+- Extract logs and docker inspect info
+- Writing tests (including code cov)
