@@ -2,10 +2,10 @@
 collects test results from test containers and save the results to disk
 
 ## Usage
+Run `docker run -it -v /var/run/docker.sock:/var/run/docker.sock gaiadocker/tugbot-collect tugbot-collect -h`
 
+To get the usage:
 ```
-docker run -it -v /var/run/docker.sock:/var/run/docker.sock gaiadocker/tugbot-collect tugbot-collect -h
-
 NAME:
    tugbot-collect - Collects result from test containers (use TC_LOG_LEVEL env var to change the default which is debug
 
