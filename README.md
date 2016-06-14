@@ -25,3 +25,5 @@ By default, tugbot-collect will:
   
   - Save all to the `output directory` (by default `/var/logs/tugbot-collect/`) under a unique folder (folder name will be composed of `image name`-`time`-`short container id`).
 
+## TC_LOG_LEVEL EnvVar
+
