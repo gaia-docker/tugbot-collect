@@ -1,7 +1,5 @@
-# Under construction, not fully function yet.
-
 # tugbot-collect
-collects test results from test containers and send the results to results service
+collects test results from test containers and save the results to disk
 
 ## Docker run command
 
@@ -9,21 +7,27 @@ collects test results from test containers and send the results to results servi
 docker run -d -v /var/run/docker.sock:/var/run/docker.sock gaiadocker/tugbot-collect
 ```
 
-## Description
-By default, tugbot-collect will:
+## Usage
 
-1. One-time scan, on startup all of the `Exited` containers that has the label `tugbot.created.from` (means tugbot runner was the one that managed them).
+```
+./tugbot-collect --help
+NAME:
+   tugbot-collect - Collects result from test containers (use TC_LOG_LEVEL env var to change the default which is debug
 
-2. Register to docker container's `die` event (container that ends the run for any reason cause the `die` event to be published, more info about docker container events you can find [here](https://docs.docker.com/engine/reference/api/docker_remote_api/)). Look for contianers with the label `tugbot.created.from`
+USAGE:
+   tugbot-collect [global options] command [command options] [arguments...]
 
-3. For any container discovered by the `one time scan` or as a result of the `die` event: 
-  - Look for `tugbot.results.dir` label and extract the result directory as a tar file. If the label does not exist, or this operation failed for any reason - skip this step.
-  
-  - Extract the container info json (similar to what you get from `docker inspect`)
-  
-  - Try to extract the container's stdout.
-  
-  - Save all to the `output directory` (by default `/var/logs/tugbot-collect/`) under a unique folder (folder name will be composed of `image name`-`time`-`short container id`).
+VERSION:
+   1.0.0
 
-## TC_LOG_LEVEL EnvVar
-
+COMMANDS:
+GLOBAL OPTIONS:
+   --outputdir DIR_LOCATION, -o DIR_LOCATION  write results to DIR_LOCATION, if you want not to output results - set this flag with the directory '/dev/null' (default: "/tmp/tugbot-collect")
+   --resultsdirlabel KEY, -r KEY              tugbot-collect will use this label KEY to fetch the label value, to find out the results dir of the test container (default: "tugbot.results.dir")
+   --matchlabel KEY, -m KEY                   tugbot-collect will collect results from test containers matching this label KEY (default: "tugbot.created.from")
+   --scanonstartup, -e                        scan for existed containers on startup and extract their results (default is false)
+   --dockerrm, -d                             remove the container after extracting results (default is false)
+   --skipevents, -s                           do not register to docker 'die' events (default is false - hence by default we do register to events)
+   --help, -h                                 show help
+   --version, -v                              print the version
+```

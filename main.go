@@ -11,56 +11,82 @@ import (
 	//"github.com/vdemeester/docker-events"
 	//"golang.org/x/net/context"
 	//"io"
+	"github.com/gaia-docker/tugbot-collect/processor"
+	"github.com/gaia-docker/tugbot-collect/scanner"
 	"os"
 	"os/signal"
 	"syscall"
-	"github.com/gaia-docker/tugbot-collect/processor"
-	"github.com/gaia-docker/tugbot-collect/scanner"
+	"github.com/gaia-docker/tugbot-collect/eventlistener"
 )
 
 var logger = log.GetLogger("main")
 
-func main() {
+var dockerrm bool
+var scanonstartup bool
+var skipevents bool
+var outputdir string
+var matchlabel string
+var resultsdirlabel string
 
-	var dockerrm bool
-	var scanonstartup bool
-	var skipevents bool
-	var outputdir string
+func main() {
 
 	app := cli.NewApp()
 	app.Version = "1.0.0"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:        "outputdir, o",
-			Value:       "/var/logs/tugbot-collect",
+			Value:       "/tmp/tugbot-collect",
 			Usage:       "write results to `DIR_LOCATION`, if you want not to output results - set this flag with the directory '/dev/null'",
 			Destination: &outputdir,
 		},
+		cli.StringFlag{
+			Name:        "resultsdirlabel, r",
+			Value:       "tugbot.results.dir",
+			Usage:       "tugbot-collect will use this label `KEY` to fetch the label value, to find out the results dir of the test container",
+			Destination: &resultsdirlabel,
+		},
+		cli.StringFlag{
+			Name:        "matchlabel, m",
+			Value:       "tugbot.created.from",
+			Usage:       "tugbot-collect will collect results from test containers matching this label `KEY`",
+			Destination: &matchlabel,
+		},
 		cli.BoolFlag{
 			Name:        "scanonstartup, e",
-			Usage:       "scan for existed containers on startup and extract their results",
+			Usage:       "scan for existed containers on startup and extract their results (default is false)",
 			Destination: &scanonstartup,
 		},
 		cli.BoolFlag{
 			Name:        "dockerrm, d",
-			Usage:       "remove the container after extracting results",
+			Usage:       "remove the container after extracting results (default is false)",
 			Destination: &dockerrm,
 		},
 		cli.BoolFlag{
 			Name:        "skipevents, s",
-			Usage:       "do not register to docker 'die' events",
+			Usage:       "do not register to docker 'die' events (default is false - hence by default we do register to events)",
 			Destination: &skipevents,
 		},
 	}
 
 	app.Name = "tugbot-collect"
-	app.Usage = "Collects result from test containers"
-	app.Action = func(c *cli.Context) error {
-		logger.Info("tugbot-collect is going to work with these flags - dockerrm: ", dockerrm, ",scanonstartup: ", scanonstartup, ",skipevents: ", skipevents, ",outputdir: ", outputdir)
-		return nil
+	app.Usage = "Collects result from test containers (use TC_LOG_LEVEL env var to change the default which is debug"
+	app.Action = start
+
+	if err := app.Run(os.Args); err != nil {
+		logger.Error("exiting from main: ", err)
 	}
 
-	app.Run(os.Args)
+}
+
+func start(c *cli.Context) error {
+
+	logger.Info("tugbot-collect is going to run with this configuration:")
+	logger.Info("scanonstartup: ", scanonstartup)
+	logger.Info("skipevents: ", skipevents)
+	logger.Info("outputdir: ", outputdir)
+	logger.Info("dockerrm: ", dockerrm)
+	logger.Info("matchlabel: ", matchlabel)
+	logger.Info("resultsdirlabel: ", resultsdirlabel)
 
 	// Go signal notification works by sending `os.Signal`
 	// values on a channel. We'll create a channel to
@@ -85,17 +111,21 @@ func main() {
 
 	//Creating docker client
 	defaultHeaders := map[string]string{"User-Agent": "engine-api-cli-1.0"}
-	cli, err := client.NewClient("unix:///var/run/docker.sock", "v1.22", nil, defaultHeaders)
+	dockerClient, err := client.NewClient("unix:///var/run/docker.sock", "v1.22", nil, defaultHeaders)
 	if err != nil {
 		logger.Fatal("Failed to create docker client. why: ", err, ". panic the system.")
 		panic(err)
 	}
 
-	p := processor.NewProcessor(outputdir, dockerrm)
+	p := processor.NewProcessor(dockerClient, outputdir, resultsdirlabel, dockerrm)
 	p.Run()
 
 	if scanonstartup {
-		scanner.Scan(cli, p.Tasks)
+		scanner.Scan(dockerClient, matchlabel, p.Tasks)
+	}
+
+	if !skipevents {
+		eventlistener.Register(dockerClient, matchlabel, p.Tasks)
 	}
 
 	// The program will wait here until it gets the
@@ -105,57 +135,5 @@ func main() {
 	<-done
 	logger.Info("exiting")
 
-
-
-	/*ctx, cancel := context.WithCancel(context.Background())
-	options := types.ContainerListOptions{All: true}
-	containers, err := cli.ContainerList(ctx, options)
-	if err != nil {
-		panic(err)
-	}
-
-	for _, c := range containers {
-		fmt.Println(c.Image, "-> ", c.ID)
-		reader, pathstat, err := cli.CopyFromContainer(ctx, c.ID, "/usr/bin")
-		if err != nil {
-			fmt.Println("error from copy:", err)
-		} else {
-			// open output file
-			fo, err := os.Create("output-" + c.ID + ".tar")
-			if err != nil {
-				panic(err)
-			}
-			// close fo on exit and check for its returned error
-			defer func() {
-				if err := fo.Close(); err != nil {
-					panic(err)
-				}
-			}()
-
-			// make a buffer to keep chunks that are read
-			// buffer size==32K
-			buf := make([]byte, 32*1024)
-			writer := bufio.NewWriter(fo)
-
-			if _, err := io.CopyBuffer(writer, reader, buf); err != nil {
-				panic(err)
-			}
-
-			fmt.Println("pathstat for copied folder: ", pathstat)
-		}
-
-	}
-
-	fmt.Println("test docker events:")
-
-	errChan := events.Monitor(ctx, cli, types.EventsOptions{}, func(event eventtypes.Message) {
-		fmt.Printf("%v\n", event)
-	})
-
-	if err := <-errChan; err != nil {
-		// Do something
-	}
-
-	// Call cancel() to get out of the monitor
-	defer cancel() */
+	return nil
 }
