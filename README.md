@@ -1,4 +1,6 @@
 # tugbot-collect
+[![Docker badge](https://img.shields.io/docker/pulls/gaiadocker/tugbot-collect.svg)](https://hub.docker.com/r/gaiadocker/tugbot-collect/)
+
 collects test results from test containers and save the results to disk
 
 ## Usage
