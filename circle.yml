@@ -7,7 +7,7 @@ machine:
 dependencies:
   override:
     # create builder image
-    - docker build -t tugbot-collect/builder -f Build.Dockerfile .
+    - docker build -t tugbot-collect/builder -f Dockerfile.build .
     # compile tugbot-collect binary (linux/amd64)
     - docker run --rm -v "$PWD":/go/src/github.com/gaia-docker/tugbot-collect -w /go/src/github.com/gaia-docker/tugbot-collect tugbot-collect/builder scripts/go_build.sh
     # create tugbot-collect Docker image too
