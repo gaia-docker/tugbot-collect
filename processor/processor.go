@@ -14,8 +14,8 @@ import (
 
 var logger = log.GetLogger("processor")
 
-//Process any container that is pushed to the Tasks channel -
-//collecting the results and write to disk / publish to the results service
+//Processor is a struct to hold the Tasks channel
+//You should use NewProcessor to allocate new one and the Run func to run it
 type Processor struct {
 	Tasks            chan string
 	dockerClient     *client.Client
