@@ -25,6 +25,7 @@ var dockerrm bool
 var scanonstartup bool
 var skipevents bool
 var outputdir string
+var resultservice string
 var matchlabel string
 var resultsdirlabel string
 
@@ -33,6 +34,12 @@ func main() {
 	app := cli.NewApp()
 	app.Version = "1.0.0"
 	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:        "resultservice, s",
+			Value:       "http://results-service:8080/results",
+			Usage:       "write results to `URL`, if you want to post results to the results service - set this flag with 'null'",
+			Destination: &resultservice,
+		},
 		cli.StringFlag{
 			Name:        "outputdir, o",
 			Value:       "/tmp/tugbot-collect",
@@ -87,6 +94,7 @@ func start(c *cli.Context) error {
 	logger.Info("dockerrm: ", dockerrm)
 	logger.Info("matchlabel: ", matchlabel)
 	logger.Info("resultsdirlabel: ", resultsdirlabel)
+	logger.Info("resultservice: ", resultservice)
 
 	// Go signal notification works by sending `os.Signal`
 	// values on a channel. We'll create a channel to
@@ -117,7 +125,7 @@ func start(c *cli.Context) error {
 		panic(err)
 	}
 
-	p := processor.NewProcessor(dockerClient, outputdir, resultsdirlabel, dockerrm)
+	p := processor.NewProcessor(dockerClient, outputdir, resultservice, resultsdirlabel, dockerrm)
 	p.Run()
 
 	if scanonstartup {
