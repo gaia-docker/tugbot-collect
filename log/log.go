@@ -25,6 +25,7 @@ func init() {
 
 }
 
+//GetLogger returns a logger and writes the context as a field in any log print
 func GetLogger(context string) *logrus.Entry {
 	return log.WithFields(logrus.Fields{"context": context})
 }

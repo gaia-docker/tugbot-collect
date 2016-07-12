@@ -12,11 +12,13 @@ import (
 
 var logger = log.GetLogger("eventlistener")
 
+//Register to "die" events of docker (any container that stopped, killed or exited)
+//and writing the container id of any container that has the matchlabel to the tasks channel
 func Register(dockerClient *client.Client, matchlabel string, tasks chan string) {
 	go func() {
 		ctx, cancel := context.WithCancel(context.Background())
 
-		// Setup the event handler on 'die' event (will catch stop and kill and naturally exit
+		// Setup the event handler on 'die' event (will catch stop and kill and naturally exit)
 		eventHandler := events.NewHandler(events.ByAction)
 		eventHandler.Handle("die", func(event eventtypes.Message) {
 			logger.Info("cought event: ", event)

@@ -14,7 +14,8 @@ import (
 
 var logger = log.GetLogger("processor")
 
-//Process any container that is pushed to the Tasks channel - collecting the results and write to disk / publish to the results service
+//Process any container that is pushed to the Tasks channel -
+//collecting the results and write to disk / publish to the results service
 type Processor struct {
 	Tasks            chan string
 	dockerClient     *client.Client
@@ -24,6 +25,7 @@ type Processor struct {
 	dockerRM         bool
 }
 
+//NewProcessor create new Processor and allocates Tasks buffered channel in size 10 to it
 func NewProcessor(pDockerClient *client.Client, pOutputDir string, pResultServiceUrl string, pResultsDirLabel string, pDockerRM bool) Processor {
 	p := Processor{
 		dockerClient:     pDockerClient,
@@ -36,6 +38,7 @@ func NewProcessor(pDockerClient *client.Client, pOutputDir string, pResultServic
 	return p
 }
 
+//Run the processor (listen to the Tasks channel and performs the collection)
 func (p Processor) Run() {
 	go func() {
 		for task := range p.Tasks {
