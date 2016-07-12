@@ -1,5 +1,6 @@
 # tugbot-collect
 [![CircleCI](https://circleci.com/gh/gaia-docker/tugbot-collect.svg?style=shield)](https://circleci.com/gh/gaia-docker/tugbot-collect)
+[![Go Report Card](https://goreportcard.com/badge/github.com/gaia-docker/tugbot-collect)](https://goreportcard.com/report/github.com/gaia-docker/tugbot-collect)
 [![Docker badge](https://img.shields.io/docker/pulls/gaiadocker/tugbot-collect.svg)](https://hub.docker.com/r/gaiadocker/tugbot-collect/)
 [![Docker Image Layers](https://imagelayers.io/badge/gaiadocker/tugbot-collect:latest.svg)](https://imagelayers.io/?images=gaiadocker/tugbot-collect:latest 'Get your own badge on imagelayers.io')
 
