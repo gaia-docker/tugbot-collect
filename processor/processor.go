@@ -3,33 +3,34 @@ package processor
 import (
 	"bufio"
 	"github.com/docker/engine-api/client"
+	"github.com/docker/engine-api/types"
 	"github.com/gaia-docker/tugbot-collect/log"
 	"golang.org/x/net/context"
 	"io"
 	"os"
 	"path/filepath"
 	"strings"
-	"github.com/docker/engine-api/types"
 )
 
 var logger = log.GetLogger("processor")
 
+//Process any container that is pushed to the Tasks channel - collecting the results and write to disk / publish to the results service
 type Processor struct {
 	Tasks            chan string
 	dockerClient     *client.Client
-	outputdir        string
-	resultserviceurl string
-	resultsdirlabel  string
-	dockerrm         bool
+	outputDir        string
+	resultServiceUrl string
+	resultsDirLabel  string
+	dockerRM         bool
 }
 
-func NewProcessor(p_dockerClient *client.Client, p_outputdir string, p_resultserviceurl string, p_resultsdirlabel string, p_dockerrm bool) Processor {
+func NewProcessor(pDockerClient *client.Client, pOutputDir string, pResultServiceUrl string, pResultsDirLabel string, pDockerRM bool) Processor {
 	p := Processor{
-		dockerClient:    p_dockerClient,
-		outputdir:       p_outputdir,
-		resultserviceurl:   p_resultserviceurl,
-		resultsdirlabel: p_resultsdirlabel,
-		dockerrm:        p_dockerrm,
+		dockerClient:     pDockerClient,
+		outputDir:        pOutputDir,
+		resultServiceUrl: pResultServiceUrl,
+		resultsDirLabel:  pResultsDirLabel,
+		dockerRM:         pDockerRM,
 	}
 	p.Tasks = make(chan string, 10)
 	return p
@@ -54,7 +55,7 @@ func (p Processor) Run() {
 
 				//copy the result dir from inside the container into memory
 				//The result dir will be return in tar format
-				resultDir := contInfo.Config.Labels[p.resultsdirlabel]
+				resultDir := contInfo.Config.Labels[p.resultsDirLabel]
 				logger.Info("going to extract results for container with id: ", contId, ", from this location inside the test container: ", resultDir)
 				reader, pathstat, err := p.dockerClient.CopyFromContainer(ctx, contId, resultDir)
 				if err != nil {
@@ -70,7 +71,7 @@ func (p Processor) Run() {
 
 				//write the results to disk
 				writeToDiskStatus := make(chan error)
-				writeToDisk(p.outputdir, contInfo.Config.Image, contId, reader, writeToDiskStatus)
+				writeToDisk(p.outputDir, contInfo.Config.Image, contId, reader, writeToDiskStatus)
 				if <-writeToDiskStatus != nil {
 					logger.Error("failed to write to disk")
 					return
@@ -78,7 +79,7 @@ func (p Processor) Run() {
 
 				logger.Info("sucessfully extracted results from container with id: ", contId)
 
-				if p.dockerrm {
+				if p.dockerRM {
 					err = p.dockerClient.ContainerRemove(ctx, contId, types.ContainerRemoveOptions{})
 					if err != nil {
 						logger.Error("failed to remove container with id: ", contId, ", why: ", err)
@@ -127,7 +128,7 @@ func writeToDisk(outputDir, imageName, contId string, reader io.ReadCloser, retu
 
 		// make a buffer to keep chunks that are read
 		// buffer size==32K
-		buf := make([]byte, 32 * 1024)
+		buf := make([]byte, 32*1024)
 		writer := bufio.NewWriter(fo)
 
 		if _, err := io.CopyBuffer(writer, reader, buf); err != nil {
