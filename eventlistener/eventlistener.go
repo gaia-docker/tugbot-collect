@@ -2,12 +2,12 @@ package eventlistener
 
 import (
 	"github.com/docker/engine-api/client"
-	"golang.org/x/net/context"
-	"github.com/gaia-docker/tugbot-collect/log"
-	"github.com/vdemeester/docker-events"
 	"github.com/docker/engine-api/types"
 	eventtypes "github.com/docker/engine-api/types/events"
 	"github.com/docker/engine-api/types/filters"
+	"github.com/gaia-docker/tugbot-collect/log"
+	"github.com/vdemeester/docker-events"
+	"golang.org/x/net/context"
 )
 
 var logger = log.GetLogger("eventlistener")

@@ -11,12 +11,12 @@ import (
 	//"github.com/vdemeester/docker-events"
 	//"golang.org/x/net/context"
 	//"io"
+	"github.com/gaia-docker/tugbot-collect/eventlistener"
 	"github.com/gaia-docker/tugbot-collect/processor"
 	"github.com/gaia-docker/tugbot-collect/scanner"
 	"os"
 	"os/signal"
 	"syscall"
-	"github.com/gaia-docker/tugbot-collect/eventlistener"
 )
 
 var logger = log.GetLogger("main")

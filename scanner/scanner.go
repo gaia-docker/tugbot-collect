@@ -1,11 +1,11 @@
 package scanner
 
 import (
-	"github.com/gaia-docker/tugbot-collect/log"
 	"github.com/docker/engine-api/client"
-	"golang.org/x/net/context"
 	"github.com/docker/engine-api/types"
 	"github.com/docker/engine-api/types/filters"
+	"github.com/gaia-docker/tugbot-collect/log"
+	"golang.org/x/net/context"
 )
 
 var logger = log.GetLogger("scanner")
