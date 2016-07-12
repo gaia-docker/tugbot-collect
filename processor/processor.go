@@ -15,19 +15,19 @@ import (
 var logger = log.GetLogger("processor")
 
 type Processor struct {
-	Tasks           chan string
-	dockerClient    *client.Client
-	outputdir       string
-	resultservice   string
-	resultsdirlabel string
-	dockerrm        bool
+	Tasks            chan string
+	dockerClient     *client.Client
+	outputdir        string
+	resultserviceurl string
+	resultsdirlabel  string
+	dockerrm         bool
 }
 
-func NewProcessor(p_dockerClient *client.Client, p_outputdir string, p_resultservice string, p_resultsdirlabel string, p_dockerrm bool) Processor {
+func NewProcessor(p_dockerClient *client.Client, p_outputdir string, p_resultserviceurl string, p_resultsdirlabel string, p_dockerrm bool) Processor {
 	p := Processor{
 		dockerClient:    p_dockerClient,
 		outputdir:       p_outputdir,
-		resultservice:   p_resultservice,
+		resultserviceurl:   p_resultserviceurl,
 		resultsdirlabel: p_resultsdirlabel,
 		dockerrm:        p_dockerrm,
 	}
