@@ -22,6 +22,7 @@ VERSION:
 
 COMMANDS:
 GLOBAL OPTIONS:
+   --resultserviceurl URL, -u URL             write results to URL, if you want to post results to the results service - set this flag with 'null' (default: "http://localhost:8080/results")
    --outputdir DIR_LOCATION, -o DIR_LOCATION  write results to DIR_LOCATION, if you want not to output results - set this flag with the directory '/dev/null' (default: "/tmp/tugbot-collect")
    --resultsdirlabel KEY, -r KEY              tugbot-collect will use this label KEY to fetch the label value, to find out the results dir of the test container (default: "tugbot.results.dir")
    --matchlabel KEY, -m KEY                   tugbot-collect will collect results from test containers matching this label KEY (default: "tugbot.created.from")
@@ -30,6 +31,7 @@ GLOBAL OPTIONS:
    --skipevents, -s                           do not register to docker 'die' events (default is false - hence by default we do register to events)
    --help, -h                                 show help
    --version, -v                              print the version
+
 ```
 
 # Addtional notes
