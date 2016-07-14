@@ -36,8 +36,8 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:        "resultserviceurl, u",
-			Value:       "http://results-service:8080/results",
-			Usage:       "write results to `URL`, if you want to post results to the results service - set this flag with 'null'",
+			Value:       "http://localhost:8080/results",
+			Usage:       "write results to `URL`, if you do not want to post results to the results service - set this flag with 'null'",
 			Destination: &resultserviceurl,
 		},
 		cli.StringFlag{
