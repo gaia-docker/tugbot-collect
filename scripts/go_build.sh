@@ -8,4 +8,5 @@ go_build() {
   go build -v -o ${distdir}/tugbot-collect
 }
 
+set -x
 go_build

@@ -1,22 +1,22 @@
 hash: 2fe4abdbc1a625eaa5a00b2ae7f35a18c2aababd493a75fb78c977ef2eaaba1e
-updated: 2016-06-14T17:45:22.757835+03:00
+updated: 2016-07-26T01:13:12.9576631+03:00
 imports:
 - name: github.com/docker/distribution
-  version: 1fc752c7184a2bdcbeb26ad90eba80f9fd9c76bf
+  version: 4abae2ae560ba91db98779db2739eb97d7592fba
   subpackages:
   - github.com\docker\distribution\reference
   - github.com\docker\distribution\digest
 - name: github.com/docker/engine-api
-  version: de0bc7ec1a2b90b7191e63d3d6f06833188bbd85
+  version: 3c6d71a7e85cf5221b07630e1c17cf26baf74f97
   subpackages:
   - client
   - github.com\docker\engine-api\client
   - github.com\docker\engine-api\types
   - github.com\docker\engine-api\types\events
+  - github.com\docker\engine-api\types\filters
   - github.com\docker\engine-api\client\transport
   - github.com\docker\engine-api\client\transport\cancellable
   - github.com\docker\engine-api\types\container
-  - github.com\docker\engine-api\types\filters
   - github.com\docker\engine-api\types\network
   - github.com\docker\engine-api\types\reference
   - github.com\docker\engine-api\types\registry
@@ -35,25 +35,28 @@ imports:
   version: f2d77a61e3c169b43402a0a1e84f06daf29b8190
   subpackages:
   - github.com\docker\go-units
+- name: github.com/gaia-docker/tugbot-parse
+  version: c912c61ed7ad3a40620b6080201edeaef1047e53
+  subpackages:
+  - github.com\gaia-docker\tugbot-parse
 - name: github.com/Microsoft/go-winio
-  version: 4f1a71750d95a5a8a46c40a67ffbed8129c2f138
+  version: ce2922f643c8fd76b46cadc7f404a06282678b34
   subpackages:
   - github.com\Microsoft\go-winio
 - name: github.com/opencontainers/runc
-  version: 42dfd606437b538ffde4f0640d433916bee928e3
+  version: fb221651e5120cd287a76c7c1b6c877520fbd034
   subpackages:
   - github.com\opencontainers\runc\libcontainer\user
 - name: github.com/Sirupsen/logrus
   version: 55eb11d21d2a31a3cc93838241d04800f52e823d
   subpackages:
-  - formatters/logstash
   - github.com\Sirupsen\logrus
 - name: github.com/urfave/cli
-  version: e5bef42c62aa7d25aba4880dc02b7624f01e9e19
+  version: e43a9fbf1eb1e0c7a948b73e56ef23aec73c5d84
   subpackages:
   - github.com\urfave\cli
 - name: github.com/vdemeester/docker-events
-  version: 20e6d2db238723e68197a9e3c6c34c99a9893a9c
+  version: be74d4929ec1ad118df54349fda4b0cba60f849b
   subpackages:
   - github.com\vdemeester\docker-events
 - name: golang.org/x/net
@@ -62,8 +65,7 @@ imports:
   - golang.org\x\net\context
   - golang.org\x\net\proxy
 - name: golang.org/x/sys
-  version: 7f918dd405547ecb864d14a8ecbbfe205b5f930f
+  version: a646d33e2ee3172a661fc09bca23bb4889a41bc8
   subpackages:
-  - golang.org\x\sys\unix
   - golang.org\x\sys\windows
 devImports: []
