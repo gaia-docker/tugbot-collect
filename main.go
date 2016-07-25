@@ -54,7 +54,7 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:        "matchlabel, m",
-			Value:       "tugbot.created.from",
+			Value:       "tugbot.test",
 			Usage:       "tugbot-collect will collect results from test containers matching this label `KEY`",
 			Destination: &matchlabel,
 		},
