@@ -12,7 +12,7 @@ Run `docker run -it -v /var/run/docker.sock:/var/run/docker.sock gaiadocker/tugb
 To get the usage:
 ```
 NAME:
-   tugbot-collect - Collects result from test containers (use TC_LOG_LEVEL env var to change the default which is debug
+   tugbot-collect - Collects result from test containers (use TC_LOG_LEVEL env var to change the default which is debug)
 
 USAGE:
    tugbot-collect [global options] command [command options] [arguments...]
@@ -22,16 +22,16 @@ VERSION:
 
 COMMANDS:
 GLOBAL OPTIONS:
-   --resultserviceurl URL, -u URL             write results to URL, if you want to post results to the results service - set this flag with 'null' (default: "http://localhost:8080/results")
-   --outputdir DIR_LOCATION, -o DIR_LOCATION  write results to DIR_LOCATION, if you want not to output results - set this flag with the directory '/dev/null' (default: "/tmp/tugbot-collect")
-   --resultsdirlabel KEY, -r KEY              tugbot-collect will use this label KEY to fetch the label value, to find out the results dir of the test container (default: "tugbot.results.dir")
-   --matchlabel KEY, -m KEY                   tugbot-collect will collect results from test containers matching this label KEY (default: "tugbot.created.from")
-   --scanonstartup, -e                        scan for existed containers on startup and extract their results (default is false)
-   --dockerrm, -d                             remove the container after extracting results (default is false)
-   --skipevents, -s                           do not register to docker 'die' events (default is false - hence by default we do register to events)
+   --publishTarGzTo URL, -g URL               send http POST to URL with tar.gz payload contains all of the extracted results. if you want to diable the default - set this flag to 'null' (default: "http://result:8080/results")
+   --publishTestCasesTo URL, -c URL           send http POST to URL with json payload contains entry per junit testcase extracted from any junit XML within the results dir. if you want to diable the default - set this flag to 'null' (default: "http://es-results-service:8080/test_cases")
+   --outputDir DIR_LOCATION, -o DIR_LOCATION  write results to DIR_LOCATION, if you want not to output results - set this flag with the directory '/dev/null' (default: "/tmp/tugbot-collect")
+   --resultsDirLabel KEY, -r KEY              tugbot-collect will use this label KEY to fetch the label value, to find out the results dir of the test container (default: "tugbot.results.dir")
+   --matchLabel KEY, -m KEY                   tugbot-collect will collect results from test containers matching this label KEY (default: "tugbot.test")
+   --scanOnStartup, -e                        scan for existed containers on startup and extract their results (default is false)
+   --dockerRM, -d                             remove the container after extracting results (default is false)
+   --skipEvents, -s                           do not register to docker 'die' events (default is false - hence by default we do register to events)
    --help, -h                                 show help
    --version, -v                              print the version
-
 ```
 
 # Addtional notes
@@ -43,8 +43,3 @@ GLOBAL OPTIONS:
 `docker run -d -v /var/run/docker.sock:/var/run/docker.sock -e TS_LOG_LEVEL=warn gaiadocker/tugbot-collect`
 - To pass flag to tugbot-collect, use this for example:
 `docker run -d -v /var/run/docker.sock:/var/run/docker.sock gaiadocker/tugbot-collect tugbot-collect -e -d`
-
-## Missions to complete
-- Integrate with result service
-- Extract logs and docker inspect info
-- Writing tests (including code cov)
