@@ -10,15 +10,15 @@ import (
 
 var logger = log.GetLogger("scanner")
 
-//Scan for any exited containers (docker ps -f "status=exited") that has the matchlabel
+//Scan for any exited containers (docker ps -f "status=exited") that has the matchLabel
 //and write the container id to the tasks channel
-func Scan(dockerClient *client.Client, matchlabel string, tasks chan string) {
+func Scan(dockerClient *client.Client, matchLabel string, tasks chan string) {
 	go func() {
-		logger.Info("scanner trying to find exited containers with the matching label: ", matchlabel)
+		logger.Info("scanner trying to find exited containers with the matching label: ", matchLabel)
 		ctx, cancel := context.WithCancel(context.Background())
 		f := filters.NewArgs()
 		f.Add("status", "exited")
-		f.Add("label", matchlabel)
+		f.Add("label", matchLabel)
 		options := types.ContainerListOptions{Filter: f}
 		containers, err := dockerClient.ContainerList(ctx, options)
 		if err != nil {

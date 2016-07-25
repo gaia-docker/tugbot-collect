@@ -13,8 +13,8 @@ import (
 var logger = log.GetLogger("eventlistener")
 
 //Register to "die" events of docker (any container that stopped, killed or exited)
-//and writing the container id of any container that has the matchlabel to the tasks channel
-func Register(dockerClient *client.Client, matchlabel string, tasks chan string) {
+//and writing the container id of any container that has the matchLabel to the tasks channel
+func Register(dockerClient *client.Client, matchLabel string, tasks chan string) {
 	go func() {
 		ctx, cancel := context.WithCancel(context.Background())
 
@@ -28,10 +28,10 @@ func Register(dockerClient *client.Client, matchlabel string, tasks chan string)
 
 		//filter only test containers
 		f := filters.NewArgs()
-		f.Add("label", matchlabel)
+		f.Add("label", matchLabel)
 		options := types.EventsOptions{Filters: f}
 
-		logger.Info("start monitoring exited test containers with the maching label: ", matchlabel)
+		logger.Info("start monitoring exited test containers with the maching label: ", matchLabel)
 		errChan := events.MonitorWithHandler(ctx, dockerClient, options, eventHandler)
 
 		if err := <-errChan; err != nil {

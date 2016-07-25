@@ -1,32 +1,34 @@
 package processor
 
 import (
+	"archive/tar"
+	"bufio"
+	"compress/gzip"
 	"github.com/docker/engine-api/client"
 	"github.com/docker/engine-api/types"
 	"github.com/gaia-docker/tugbot-collect/log"
 	"golang.org/x/net/context"
 	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
-	"compress/gzip"
-	"archive/tar"
-	"bufio"
-	"net/http"
 )
 
 var logger = log.GetLogger("processor")
+
 const resultsTarFile = "results.tar"
 
 //Processor is a struct to hold the Tasks channel
 //You should use NewProcessor to allocate new one and the Run func to run it
 type Processor struct {
-	Tasks            chan string
-	dockerClient     *client.Client
-	outputDir        string
-	resultServiceUrl string
-	resultsDirLabel  string
-	dockerRM         bool
+	Tasks              chan string
+	dockerClient       *client.Client
+	outputDir          string
+	publishTarGzTo     string
+	publishTestCasesTo string
+	resultsDirLabel    string
+	dockerRM           bool
 }
 
 type results struct {
@@ -36,13 +38,14 @@ type results struct {
 }
 
 //NewProcessor create new Processor and allocates Tasks buffered channel in size 10 to it
-func NewProcessor(pDockerClient *client.Client, pOutputDir string, pResultServiceUrl string, pResultsDirLabel string, pDockerRM bool) Processor {
+func NewProcessor(pDockerClient *client.Client, pOutputDir, pPublishTarGzTo, pPublishTestCasesTo, pResultsDirLabel string, pDockerRM bool) Processor {
 	p := Processor{
-		dockerClient:     pDockerClient,
-		outputDir:        pOutputDir,
-		resultServiceUrl: pResultServiceUrl,
-		resultsDirLabel:  pResultsDirLabel,
-		dockerRM:         pDockerRM,
+		dockerClient:       pDockerClient,
+		outputDir:          pOutputDir,
+		publishTarGzTo:     pPublishTarGzTo,
+		publishTestCasesTo: pPublishTestCasesTo,
+		resultsDirLabel:    pResultsDirLabel,
+		dockerRM:           pDockerRM,
 	}
 	p.Tasks = make(chan string, 10)
 	return p
@@ -73,17 +76,25 @@ func (p Processor) Run() {
 					return
 				}
 
-				//send to results Service
+				//publish tar.gz
 				if outDirPath != "" {
-					err = p.sendToResultService(outDirPath)
+					err = p.publishTarGz(outDirPath)
 					if err != nil {
-						logger.Error("failed to send to results service")
+						logger.Error("failed to publish tar.gz")
 						return
 					}
 				}
 
-				logger.Info("sucessfully extracted results from container with id: ", contId)
+				//publish test cases
+				if outDirPath != "" {
+					err = p.publishTestCases(outDirPath)
+					if err != nil {
+						logger.Error("failed to publish test cases")
+						return
+					}
+				}
 
+				//We get here only if no error occurred along the way
 				if p.dockerRM {
 					err = p.dockerClient.ContainerRemove(ctx, contId, types.ContainerRemoveOptions{})
 					if err != nil {
@@ -93,6 +104,8 @@ func (p Processor) Run() {
 
 					logger.Info("sucessfully removed (docker rm) container with id: ", contId)
 				}
+
+				logger.Info("sucessfully analyzed results for container with id: ", contId)
 			}(task)
 		}
 	}()
@@ -126,16 +139,15 @@ func (p Processor) collectResults(ctx context.Context, contId string) (contResul
 	return contResults, nil
 }
 
-
 func writeToDisk(outputDir, contId string, contResults *results) (outDirFullPath string, err error) {
 
 	if outputDir == "/dev/null" {
 		logger.Info("output dir is ", outputDir, ", skip writing to disk")
-		return  "", nil
+		return "", nil
 	}
 
 	//create output dir (if dir is already exist MkdirAll will return nil)
-	outDirFullPath = filepath.Join(outputDir, strings.Replace(contResults.containerInfo.Config.Image, "/", "_", -1) + "-" + contId[:11])
+	outDirFullPath = filepath.Join(outputDir, strings.Replace(contResults.containerInfo.Config.Image, "/", "_", -1)+"-"+contId[:11])
 	err = os.MkdirAll(outDirFullPath, 0777)
 	if err != nil {
 		logger.Error("failed to create output dir: ", outDirFullPath, ", for container with id: ", contId, ", error is: ", err, " - discard processing this container")
@@ -171,11 +183,23 @@ func writeToDisk(outputDir, contId string, contResults *results) (outDirFullPath
 	return outDirFullPath, nil
 }
 
-func (p Processor) sendToResultService(outDirFullPath string) (err error) {
+func (p Processor) publishTestCases(outDirFullPath string) (err error) {
 
-	if p.resultServiceUrl == "null" || p.resultServiceUrl == "NULL" {
-		logger.Info("resultServiceUrl is ", p.resultServiceUrl, ", skip sending results")
-		return  nil
+	if p.publishTestCasesTo == "null" || p.publishTestCasesTo == "NULL" {
+		logger.Info("publishTastCasesTo is ", p.publishTarGzTo, ", skip sending tar.gz results")
+		return nil
+	}
+
+	logger.Warn("publishTastCasesTo not implemented yet. Skipping publish to:", p.publishTestCasesTo)
+
+	return nil
+}
+
+func (p Processor) publishTarGz(outDirFullPath string) (err error) {
+
+	if p.publishTarGzTo == "null" || p.publishTarGzTo == "NULL" {
+		logger.Info("publishTarGzTo is ", p.publishTarGzTo, ", skip sending tar.gz results")
+		return nil
 	}
 
 	tarGzPath, err := gzipFolder(outDirFullPath)
@@ -188,7 +212,7 @@ func (p Processor) sendToResultService(outDirFullPath string) (err error) {
 	defer f.Close()
 
 	client := new(http.Client)
-	request, err := http.NewRequest("POST", p.resultServiceUrl + "?mainfile=" + resultsTarFile, f)
+	request, err := http.NewRequest("POST", p.publishTarGzTo+"?mainfile="+resultsTarFile, f)
 	request.Header.Add("Content-Type", "application/gzip")
 	_, err = client.Do(request)
 	if err != nil {
@@ -200,6 +224,7 @@ func (p Processor) sendToResultService(outDirFullPath string) (err error) {
 	return nil
 }
 
+//gzip specific files from within "folderpath", "tarGzPath" is the output of the tar.gz file location on disk
 func gzipFolder(folderPath string) (tarGzPath string, err error) {
 	// set up the output file
 	tarGzPath = filepath.Join(folderPath, "output.tar.gz")
@@ -220,7 +245,7 @@ func gzipFolder(folderPath string) (tarGzPath string, err error) {
 		resultsTarFile,
 	}
 	// add each file as needed into the current tar archive
-	for _,fileName := range files {
+	for _, fileName := range files {
 		if err := addFileToTar(tw, folderPath, fileName); err != nil {
 			logger.Error("failed to add: ", fileName, " to output.tar.gz, error: ", err)
 			return "", err
@@ -230,7 +255,7 @@ func gzipFolder(folderPath string) (tarGzPath string, err error) {
 	return tarGzPath, nil
 }
 
-func addFileToTar(tw * tar.Writer, folderPath, fileName string) error {
+func addFileToTar(tw *tar.Writer, folderPath, fileName string) error {
 	fullPath := filepath.Join(folderPath, fileName)
 	file, err := os.Open(fullPath)
 	if err != nil {

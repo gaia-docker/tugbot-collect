@@ -21,13 +21,14 @@ import (
 
 var logger = log.GetLogger("main")
 
-var dockerrm bool
-var scanonstartup bool
-var skipevents bool
-var outputdir string
-var resultserviceurl string
-var matchlabel string
-var resultsdirlabel string
+var dockerRM bool
+var scanOnStartup bool
+var skipEvents bool
+var outputDir string
+var publishTarGzTo string
+var publishTestCasesTo string
+var matchLabel string
+var resultsDirLabel string
 
 func main() {
 
@@ -35,43 +36,49 @@ func main() {
 	app.Version = "1.0.0"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:        "resultserviceurl, u",
+			Name:        "publishTarGzTo, g",
 			Value:       "http://result:8080/results",
-			Usage:       "write results to `URL`, if you do not want to post results to the results service - set this flag with 'null'",
-			Destination: &resultserviceurl,
+			Usage:       "send http POST to `URL` with tar.gz payload contains all of the extracted results. if you want to diable the default - set this flag to 'null'",
+			Destination: &publishTarGzTo,
 		},
 		cli.StringFlag{
-			Name:        "outputdir, o",
+			Name:        "publishTestCasesTo, c",
+			Value:       "http://es-results-service:8080/test_cases",
+			Usage:       "send http POST to `URL` with json payload contains entry per junit testcase extracted from any junit XML within the results dir. if you want to diable the default - set this flag to 'null'",
+			Destination: &publishTestCasesTo,
+		},
+		cli.StringFlag{
+			Name:        "outputDir, o",
 			Value:       "/tmp/tugbot-collect",
 			Usage:       "write results to `DIR_LOCATION`, if you want not to output results - set this flag with the directory '/dev/null'",
-			Destination: &outputdir,
+			Destination: &outputDir,
 		},
 		cli.StringFlag{
-			Name:        "resultsdirlabel, r",
+			Name:        "resultsDirLabel, r",
 			Value:       "tugbot.results.dir",
 			Usage:       "tugbot-collect will use this label `KEY` to fetch the label value, to find out the results dir of the test container",
-			Destination: &resultsdirlabel,
+			Destination: &resultsDirLabel,
 		},
 		cli.StringFlag{
-			Name:        "matchlabel, m",
+			Name:        "matchLabel, m",
 			Value:       "tugbot.test",
 			Usage:       "tugbot-collect will collect results from test containers matching this label `KEY`",
-			Destination: &matchlabel,
+			Destination: &matchLabel,
 		},
 		cli.BoolFlag{
-			Name:        "scanonstartup, e",
+			Name:        "scanOnStartup, e",
 			Usage:       "scan for existed containers on startup and extract their results (default is false)",
-			Destination: &scanonstartup,
+			Destination: &scanOnStartup,
 		},
 		cli.BoolFlag{
-			Name:        "dockerrm, d",
+			Name:        "dockerRM, d",
 			Usage:       "remove the container after extracting results (default is false)",
-			Destination: &dockerrm,
+			Destination: &dockerRM,
 		},
 		cli.BoolFlag{
-			Name:        "skipevents, s",
+			Name:        "skipEvents, s",
 			Usage:       "do not register to docker 'die' events (default is false - hence by default we do register to events)",
-			Destination: &skipevents,
+			Destination: &skipEvents,
 		},
 	}
 
@@ -88,13 +95,14 @@ func main() {
 func start(c *cli.Context) error {
 
 	logger.Info("tugbot-collect is going to run with this configuration:")
-	logger.Info("scanonstartup: ", scanonstartup)
-	logger.Info("skipevents: ", skipevents)
-	logger.Info("outputdir: ", outputdir)
-	logger.Info("dockerrm: ", dockerrm)
-	logger.Info("matchlabel: ", matchlabel)
-	logger.Info("resultsdirlabel: ", resultsdirlabel)
-	logger.Info("resultservice: ", resultserviceurl)
+	logger.Info("scanOnStartup: ", scanOnStartup)
+	logger.Info("skipEvents: ", skipEvents)
+	logger.Info("outputDir: ", outputDir)
+	logger.Info("dockerRM: ", dockerRM)
+	logger.Info("matchLabel: ", matchLabel)
+	logger.Info("resultsDirLabel: ", resultsDirLabel)
+	logger.Info("publishTarGzTo: ", publishTarGzTo)
+	logger.Info("publishTestCasesTo: ", publishTestCasesTo)
 
 	// Go signal notification works by sending `os.Signal`
 	// values on a channel. We'll create a channel to
@@ -125,15 +133,15 @@ func start(c *cli.Context) error {
 		panic(err)
 	}
 
-	p := processor.NewProcessor(dockerClient, outputdir, resultserviceurl, resultsdirlabel, dockerrm)
+	p := processor.NewProcessor(dockerClient, outputDir, publishTarGzTo, publishTestCasesTo, resultsDirLabel, dockerRM)
 	p.Run()
 
-	if scanonstartup {
-		scanner.Scan(dockerClient, matchlabel, p.Tasks)
+	if scanOnStartup {
+		scanner.Scan(dockerClient, matchLabel, p.Tasks)
 	}
 
-	if !skipevents {
-		eventlistener.Register(dockerClient, matchlabel, p.Tasks)
+	if !skipEvents {
+		eventlistener.Register(dockerClient, matchLabel, p.Tasks)
 	}
 
 	// The program will wait here until it gets the
