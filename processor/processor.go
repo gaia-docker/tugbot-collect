@@ -13,6 +13,9 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+        "github.com/gaia-docker/tugbot-parse"
+	"encoding/json"
+	"bytes"
 )
 
 var logger = log.GetLogger("processor")
@@ -87,7 +90,7 @@ func (p Processor) Run() {
 
 				//publish test cases
 				if outDirPath != "" {
-					err = p.publishTestCases(outDirPath)
+					err = p.publishTestCases(outDirPath, contId, contResults)
 					if err != nil {
 						logger.Error("failed to publish test cases")
 						return
@@ -183,14 +186,111 @@ func writeToDisk(outputDir, contId string, contResults *results) (outDirFullPath
 	return outDirFullPath, nil
 }
 
-func (p Processor) publishTestCases(outDirFullPath string) (err error) {
+func (p Processor) publishTestCases(outDirFullPath string, contId string, contResults *results) (err error) {
 
 	if p.publishTestCasesTo == "null" || p.publishTestCasesTo == "NULL" {
 		logger.Info("publishTastCasesTo is ", p.publishTarGzTo, ", skip sending tar.gz results")
 		return nil
 	}
 
-	logger.Warn("publishTastCasesTo not implemented yet. Skipping publish to:", p.publishTestCasesTo)
+	fullPath := filepath.Join(outDirFullPath, resultsTarFile)
+	f, err := os.Open(fullPath)
+	if err != nil {
+		logger.Error("publishTestCases - failed to open tar file: ", err)
+		return err
+	}
+	defer f.Close()
+
+	client := new(http.Client)
+
+	tarReader := tar.NewReader(f)
+
+	i := 0
+	for {
+		header, err := tarReader.Next()
+
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			logger.Error("publishTestCases - failed iterate tar file: ", err)
+			return err
+		}
+
+		name := header.Name
+
+		switch header.Typeflag {
+		case tar.TypeDir:
+			continue
+		case tar.TypeReg:
+			logger.Info("tar (", i, ")", "Name: ", name)
+			if strings.HasSuffix(name, "xml") {
+
+				if header.Size <= 0 {
+					logger.Warn("cannot process: ", name, " file from the tar, invalid file size: ", header.Size, ". skipping this file")
+					continue
+				}
+
+				buf := make([]byte, header.Size)
+				_, err := tarReader.Read(buf)
+				if err != nil {
+					logger.Warn("failed to read: ", name, " file from the tar, err: ", err, ". skipping this file")
+					continue
+				}
+
+				testSet, err := parse.ToTestSet(buf)
+				if err != nil {
+					logger.Warn("failed to convert xml to testset for file: ", name, ", err: ", err, ". skipping this file")
+					continue
+				}
+
+				json, err := json.Marshal(struct {
+					 ImageName string
+					ContainerId string
+					StartedAt string
+					FinishedAt string
+					ExitCode int
+					HostName string
+					 TestSet *parse.TestSet
+				}{
+					ImageName:  contResults.containerInfo.Config.Image,
+					ContainerId: contId,
+					StartedAt: contResults.containerInfo.State.StartedAt,
+					FinishedAt: contResults.containerInfo.State.FinishedAt,
+					ExitCode: contResults.containerInfo.State.ExitCode,
+					HostName: contResults.containerInfo.Config.Hostname,
+					TestSet: testSet,
+				})
+
+				if err != nil {
+					logger.Warn("failed to convery testset to json for file: ", name, ", err: ", err, ". skipping this file")
+					continue
+				}
+
+				logger.Debug("json for file: ", name, ", is: ", string(json))
+
+				r := bytes.NewReader(json)
+				request, err := http.NewRequest("POST", p.publishTestCasesTo, r)
+				request.Header.Add("Content-Type", "application/json")
+				_, err = client.Do(request)
+				if err != nil {
+					logger.Error("error publish json: ", err)
+					return err
+				}
+			}
+
+		default:
+			logger.Infof("%s : %c %s %s\n",
+				"Yikes! Unable to figure out type",
+				header.Typeflag,
+				"in file",
+				name,
+			)
+		}
+
+		i++
+	}
 
 	return nil
 }
