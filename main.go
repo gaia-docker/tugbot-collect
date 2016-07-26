@@ -37,13 +37,13 @@ func main() {
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
 			Name:        "publishTarGzTo, g",
-			Value:       "http://result:8080/results",
+			Value:       "http://result-service:8080/results",
 			Usage:       "send http POST to `URL` with tar.gz payload contains all of the extracted results. if you want to diable the default - set this flag to 'null'",
 			Destination: &publishTarGzTo,
 		},
 		cli.StringFlag{
 			Name:        "publishTestCasesTo, c",
-			Value:       "http://es-results-service:8080/test_cases",
+			Value:       "http://result-service-es:8081/results",
 			Usage:       "send http POST to `URL` with json payload contains entry per junit testcase extracted from any junit XML within the results dir. if you want to diable the default - set this flag to 'null'",
 			Destination: &publishTestCasesTo,
 		},
