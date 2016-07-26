@@ -2,7 +2,6 @@ package processor
 
 import (
 	"archive/tar"
-	"bufio"
 	"compress/gzip"
 	"github.com/docker/engine-api/client"
 	"github.com/docker/engine-api/types"
@@ -35,7 +34,7 @@ type Processor struct {
 }
 
 type results struct {
-	testResults         io.Reader
+	testResults         io.ReadCloser
 	testResultsPathStat types.ContainerPathStat
 	containerInfo       types.ContainerJSON
 }
@@ -128,6 +127,10 @@ func (p Processor) collectResults(ctx context.Context, contId string) (contResul
 	resultDir := contResults.containerInfo.Config.Labels[p.resultsDirLabel]
 	logger.Info("going to extract results for container with id: ", contId, ", from this location inside the test container: ", resultDir)
 	contResults.testResults, contResults.testResultsPathStat, err = p.dockerClient.CopyFromContainer(ctx, contId, resultDir)
+	/*buf := new(bytes.Buffer)
+	buf.ReadFrom(contResults.testResults)
+	s := buf.String()
+	logger.Info("tar for cont: ", contId, ", data: ", s) */
 	if err != nil {
 		logger.Error("failed to copy result dir from container with id: ", contId, ", error is: ", err, " - discard processing this container")
 		return nil, err
@@ -172,13 +175,14 @@ func writeToDisk(outputDir, contId string, contResults *results) (outDirFullPath
 		}
 	}()
 
-	// make a buffer to keep chunks that are read
-	// buffer size==32K
-	buf := make([]byte, 32*1024)
-	writer := bufio.NewWriter(fo)
-
-	if _, err := io.CopyBuffer(writer, contResults.testResults, buf); err != nil {
+	_, err = io.Copy(fo, contResults.testResults)
+	if err != nil {
 		logger.Error("failed to write to tar file for container with id: ", contId, ", error is: ", err, " - discard processing this container")
+		return "", err
+	}
+
+	if err := fo.Sync(); err != nil {
+		logger.Error("failed to flash tar to disk for container with id: ", contId, ", error is: ", err, " - discard processing this container")
 		return "", err
 	}
 
