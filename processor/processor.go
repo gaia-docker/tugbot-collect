@@ -275,7 +275,7 @@ func (p Processor) publishTestCases(outDirFullPath string, contId string, contRe
 				logger.Debug("json for file: ", name, ", is: ", string(json))
 
 				r := bytes.NewReader(json)
-				request, err := http.NewRequest("POST", p.publishTestCasesTo, r)
+				request, err := http.NewRequest("POST", p.publishTestCasesTo + "?docker.imagename=" + contResults.containerInfo.Config.Image, r)
 				request.Header.Add("Content-Type", "application/json")
 				_, err = client.Do(request)
 				if err != nil {
