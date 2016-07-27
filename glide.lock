@@ -1,5 +1,5 @@
 hash: 2fe4abdbc1a625eaa5a00b2ae7f35a18c2aababd493a75fb78c977ef2eaaba1e
-updated: 2016-07-26T01:13:12.9576631+03:00
+updated: 2016-07-27T14:20:12.4837631+03:00
 imports:
 - name: github.com/docker/distribution
   version: 4abae2ae560ba91db98779db2739eb97d7592fba
@@ -7,7 +7,7 @@ imports:
   - github.com\docker\distribution\reference
   - github.com\docker\distribution\digest
 - name: github.com/docker/engine-api
-  version: 3c6d71a7e85cf5221b07630e1c17cf26baf74f97
+  version: dccf10e58ac9d544c9f7fadcc3f60a8413d0df98
   subpackages:
   - client
   - github.com\docker\engine-api\client
@@ -36,7 +36,7 @@ imports:
   subpackages:
   - github.com\docker\go-units
 - name: github.com/gaia-docker/tugbot-parse
-  version: c912c61ed7ad3a40620b6080201edeaef1047e53
+  version: 0bc78ceafbe0749f822e69566e0b6579095b0a82
   subpackages:
   - github.com\gaia-docker\tugbot-parse
 - name: github.com/Microsoft/go-winio
@@ -44,15 +44,16 @@ imports:
   subpackages:
   - github.com\Microsoft\go-winio
 - name: github.com/opencontainers/runc
-  version: fb221651e5120cd287a76c7c1b6c877520fbd034
+  version: 522674998576b3aefdde233ffab20f763b83ac19
   subpackages:
   - github.com\opencontainers\runc\libcontainer\user
 - name: github.com/Sirupsen/logrus
   version: 55eb11d21d2a31a3cc93838241d04800f52e823d
   subpackages:
+  - formatters/logstash
   - github.com\Sirupsen\logrus
 - name: github.com/urfave/cli
-  version: e43a9fbf1eb1e0c7a948b73e56ef23aec73c5d84
+  version: d9021faab69f92295ef7061bd39e4a76dcbdef32
   subpackages:
   - github.com\urfave\cli
 - name: github.com/vdemeester/docker-events
