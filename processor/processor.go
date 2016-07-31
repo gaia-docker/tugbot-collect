@@ -2,19 +2,19 @@ package processor
 
 import (
 	"archive/tar"
+	"bytes"
 	"compress/gzip"
+	"encoding/json"
 	"github.com/docker/engine-api/client"
 	"github.com/docker/engine-api/types"
 	"github.com/gaia-docker/tugbot-collect/log"
+	"github.com/gaia-docker/tugbot-parse"
 	"golang.org/x/net/context"
 	"io"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
-        "github.com/gaia-docker/tugbot-parse"
-	"encoding/json"
-	"bytes"
 )
 
 var logger = log.GetLogger("processor")
@@ -260,12 +260,11 @@ func (p Processor) publishTestCases(outDirFullPath string, contId string, contRe
 
 				for _, test := range tests {
 					json, err := json.Marshal(struct {
-						TugbotData   *tugbotData
-						Test parse.AnalyticsTest
-
+						TugbotData *tugbotData
+						Test       parse.AnalyticsTest
 					}{
-						TugbotData:  tugbotDt,
-						Test: test,
+						TugbotData: tugbotDt,
+						Test:       test,
 					})
 
 					if err != nil {
@@ -276,7 +275,7 @@ func (p Processor) publishTestCases(outDirFullPath string, contId string, contRe
 					logger.Debug("json for file: ", name, ", is: ", string(json))
 
 					r := bytes.NewReader(json)
-					request, err := http.NewRequest("POST", p.publishTestCasesTo + "?docker.imagename=" + contResults.containerInfo.Config.Image, r)
+					request, err := http.NewRequest("POST", p.publishTestCasesTo+"?docker.imagename="+contResults.containerInfo.Config.Image, r)
 					request.Header.Add("Content-Type", "application/json")
 					_, err = client.Do(request)
 					if err != nil {
@@ -284,7 +283,6 @@ func (p Processor) publishTestCases(outDirFullPath string, contId string, contRe
 						return err
 					}
 				}
-
 
 			}
 
@@ -389,13 +387,13 @@ func addFileToTar(tw *tar.Writer, folderPath, fileName string) error {
 	return nil
 }
 
-func getTugbotData(contInfo types.ContainerJSON, contId string) (*tugbotData) {
-	return &tugbotData {
-		ImageName:  contInfo.Config.Image,
+func getTugbotData(contInfo types.ContainerJSON, contId string) *tugbotData {
+	return &tugbotData{
+		ImageName:   contInfo.Config.Image,
 		ContainerId: contId,
-		StartedAt: contInfo.State.StartedAt,
-		FinishedAt: contInfo.State.FinishedAt,
-		ExitCode: contInfo.State.ExitCode,
-		HostName: contInfo.Config.Hostname,
+		StartedAt:   contInfo.State.StartedAt,
+		FinishedAt:  contInfo.State.FinishedAt,
+		ExitCode:    contInfo.State.ExitCode,
+		HostName:    contInfo.Config.Hostname,
 	}
 }
