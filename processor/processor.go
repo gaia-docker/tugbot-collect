@@ -39,6 +39,15 @@ type results struct {
 	containerInfo       types.ContainerJSON
 }
 
+type tugbotData struct {
+	ImageName   string
+	ContainerId string
+	StartedAt   string
+	FinishedAt  string
+	ExitCode    int
+	HostName    string
+}
+
 //NewProcessor create new Processor and allocates Tasks buffered channel in size 10 to it
 func NewProcessor(pDockerClient *client.Client, pOutputDir, pPublishTarGzTo, pPublishTestCasesTo, pResultsDirLabel string, pDockerRM bool) Processor {
 	p := Processor{
@@ -205,8 +214,8 @@ func (p Processor) publishTestCases(outDirFullPath string, contId string, contRe
 	}
 	defer f.Close()
 
+	tugbotDt := getTugbotData(contResults.containerInfo, contId)
 	client := new(http.Client)
-
 	tarReader := tar.NewReader(f)
 
 	i := 0
@@ -243,45 +252,40 @@ func (p Processor) publishTestCases(outDirFullPath string, contId string, contRe
 					continue
 				}
 
-				testSet, err := parse.ToTestSet(buf)
+				tests, err := parse.ToAnalyticsTests(buf)
 				if err != nil {
-					logger.Warn("failed to convert xml to testset for file: ", name, ", err: ", err, ". skipping this file")
+					logger.Warn("failed to convert xml to tests slice for file: ", name, ", err: ", err, ". skipping this file")
 					continue
 				}
 
-				json, err := json.Marshal(struct {
-					 ImageName string
-					ContainerId string
-					StartedAt string
-					FinishedAt string
-					ExitCode int
-					HostName string
-					 TestSet *parse.TestSet
-				}{
-					ImageName:  contResults.containerInfo.Config.Image,
-					ContainerId: contId,
-					StartedAt: contResults.containerInfo.State.StartedAt,
-					FinishedAt: contResults.containerInfo.State.FinishedAt,
-					ExitCode: contResults.containerInfo.State.ExitCode,
-					HostName: contResults.containerInfo.Config.Hostname,
-					TestSet: testSet,
-				})
+				for _, test := range tests {
+					json, err := json.Marshal(struct {
+						TugbotData   *tugbotData
+						Test parse.AnalyticsTest
 
-				if err != nil {
-					logger.Warn("failed to convery testset to json for file: ", name, ", err: ", err, ". skipping this file")
-					continue
+					}{
+						TugbotData:  tugbotDt,
+						Test: test,
+					})
+
+					if err != nil {
+						logger.Warn("failed to convert specific AnalyticsTest to json for file: ", name, ", err: ", err, ". skipping this file")
+						continue
+					}
+
+					logger.Debug("json for file: ", name, ", is: ", string(json))
+
+					r := bytes.NewReader(json)
+					request, err := http.NewRequest("POST", p.publishTestCasesTo + "?docker.imagename=" + contResults.containerInfo.Config.Image, r)
+					request.Header.Add("Content-Type", "application/json")
+					_, err = client.Do(request)
+					if err != nil {
+						logger.Error("error publish json: ", err)
+						return err
+					}
 				}
 
-				logger.Debug("json for file: ", name, ", is: ", string(json))
 
-				r := bytes.NewReader(json)
-				request, err := http.NewRequest("POST", p.publishTestCasesTo + "?docker.imagename=" + contResults.containerInfo.Config.Image, r)
-				request.Header.Add("Content-Type", "application/json")
-				_, err = client.Do(request)
-				if err != nil {
-					logger.Error("error publish json: ", err)
-					return err
-				}
 			}
 
 		default:
@@ -383,4 +387,15 @@ func addFileToTar(tw *tar.Writer, folderPath, fileName string) error {
 		}
 	}
 	return nil
+}
+
+func getTugbotData(contInfo types.ContainerJSON, contId string) (*tugbotData) {
+	return &tugbotData {
+		ImageName:  contInfo.Config.Image,
+		ContainerId: contId,
+		StartedAt: contInfo.State.StartedAt,
+		FinishedAt: contInfo.State.FinishedAt,
+		ExitCode: contInfo.State.ExitCode,
+		HostName: contInfo.Config.Hostname,
+	}
 }

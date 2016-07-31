@@ -4,3 +4,6 @@ import:
   subpackages:
   - client
 - package: github.com/urfave/cli
+- package: github.com/gaia-docker/tugbot-parse
+  subpackages:
+  - github.com\gaia-docker\tugbot-parse
