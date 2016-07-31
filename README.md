@@ -12,7 +12,7 @@ Run `docker run -it -v /var/run/docker.sock:/var/run/docker.sock gaiadocker/tugb
 To get the usage:
 ```
 NAME:
-   tugbot-collect - Collects result from test containers (use TC_LOG_LEVEL env var to change the default which is debug)
+   tugbot-collect - Collects result from test containers (use TC_LOG_LEVEL env var to change the default which is debug
 
 USAGE:
    tugbot-collect [global options] command [command options] [arguments...]
@@ -21,9 +21,11 @@ VERSION:
    1.0.0
 
 COMMANDS:
+     help, h  Shows a list of commands or help for one command
+
 GLOBAL OPTIONS:
-   --publishTarGzTo URL, -g URL               send http POST to URL with tar.gz payload contains all of the extracted results. if you want to diable the default - set this flag to 'null' (default: "http://result:8080/results")
-   --publishTestCasesTo URL, -c URL           send http POST to URL with json payload contains entry per junit testcase extracted from any junit XML within the results dir. if you want to diable the default - set this flag to 'null' (default: "http://es-results-service:8080/test_cases")
+   --publishTarGzTo URL, -g URL               send http POST to URL with tar.gz payload contains all of the extracted results. if you want to diable the default - set this flag to 'null' (default: "http://result-service:8080/results")
+   --publishTestsTo URL, -c URL               send http POST to URL in json format for any junit test extracted from junit XMLs within the results dir. if you want to diable the default - set this flag to 'null' (default: "http://result-service-es:8081/results")
    --outputDir DIR_LOCATION, -o DIR_LOCATION  write results to DIR_LOCATION, if you want not to output results - set this flag with the directory '/dev/null' (default: "/tmp/tugbot-collect")
    --resultsDirLabel KEY, -r KEY              tugbot-collect will use this label KEY to fetch the label value, to find out the results dir of the test container (default: "tugbot.results.dir")
    --matchLabel KEY, -m KEY                   tugbot-collect will collect results from test containers matching this label KEY (default: "tugbot.test")
