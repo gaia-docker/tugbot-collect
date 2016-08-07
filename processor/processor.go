@@ -93,6 +93,10 @@ func (p Processor) Run() {
 					if err != nil {
 						logger.Error("failed to publish tar.gz")
 						return
+					} else {
+					    if p.publishTarGzTo != "null" && p.publishTarGzTo != "NULL" {
+						logger.Info("Tar.gz was published successfully")
+					    }
 					}
 				}
 
@@ -102,6 +106,10 @@ func (p Processor) Run() {
 					if err != nil {
 						logger.Error("failed to publish test cases")
 						return
+					} else {
+					    if p.publishTestCasesTo != "null" && p.publishTestCasesTo != "NULL" {
+						logger.Info("Test cases were published successfully")
+					    }
 					}
 				}
 
@@ -215,7 +223,6 @@ func (p Processor) publishTestCases(outDirFullPath string, contId string, contRe
 	defer f.Close()
 
 	tugbotDt := getTugbotData(contResults.containerInfo, contId)
-	client := new(http.Client)
 	tarReader := tar.NewReader(f)
 
 	i := 0
@@ -277,6 +284,7 @@ func (p Processor) publishTestCases(outDirFullPath string, contId string, contRe
 					r := bytes.NewReader(json)
 					request, err := http.NewRequest("POST", p.publishTestCasesTo+"?docker.imagename="+contResults.containerInfo.Config.Image, r)
 					request.Header.Add("Content-Type", "application/json")
+				        client := getHttpClient(request)
 					_, err = client.Do(request)
 					if err != nil {
 						logger.Error("error publish json: ", err)
@@ -317,9 +325,9 @@ func (p Processor) publishTarGz(outDirFullPath string) (err error) {
 	}
 	defer f.Close()
 
-	client := new(http.Client)
 	request, err := http.NewRequest("POST", p.publishTarGzTo+"?mainfile="+resultsTarFile, f)
 	request.Header.Add("Content-Type", "application/gzip")
+        client := getHttpClient(request)
 	_, err = client.Do(request)
 	if err != nil {
 		logger.Error("error uploading file: ", err)
@@ -397,3 +405,15 @@ func getTugbotData(contInfo types.ContainerJSON, contId string) *tugbotData {
 		HostName:    contInfo.Config.Hostname,
 	}
 }
+
+func getHttpClient(req *http.Request) (*http.Client) {
+    pu, err := http.ProxyFromEnvironment(req)
+    if err != nil {
+	logger.Error("No proxy configured for the request, using default client",err)
+	return new(http.Client)
+    } else {
+	logger.Info("ProxyURL: ", pu);
+	return &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(pu)}}
+    }
+}
+
