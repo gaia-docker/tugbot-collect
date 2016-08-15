@@ -1,22 +1,17 @@
 package main
 
 import (
-	//"bufio"
-	//"fmt"
 	"github.com/docker/engine-api/client"
-	//"github.com/docker/engine-api/types"
-	//eventtypes "github.com/docker/engine-api/types/events"
 	"github.com/gaia-docker/tugbot-collect/log"
 	"github.com/urfave/cli"
-	//"github.com/vdemeester/docker-events"
-	//"golang.org/x/net/context"
-	//"io"
 	"github.com/gaia-docker/tugbot-collect/eventlistener"
 	"github.com/gaia-docker/tugbot-collect/processor"
 	"github.com/gaia-docker/tugbot-collect/scanner"
 	"os"
 	"os/signal"
 	"syscall"
+	"strings"
+	"errors"
 )
 
 var logger = log.GetLogger("main")
@@ -38,13 +33,13 @@ func main() {
 		cli.StringFlag{
 			Name:        "publishTarGzTo, g",
 			Value:       "http://result-service:8080/results",
-			Usage:       "send http POST to `URL` with tar.gz payload contains all of the extracted results. if you want to diable the default - set this flag to 'null'",
+			Usage:       "send http POST to `URL` with tar.gz payload contains all of the extracted results. To disable - set this flag to 'null'",
 			Destination: &publishTarGzTo,
 		},
 		cli.StringFlag{
 			Name:        "publishTestsTo, c",
 			Value:       "http://result-service-es:8081/results",
-			Usage:       "send http POST to `URL` in json format for any junit test extracted from junit XMLs within the results dir. if you want to diable the default - set this flag to 'null'",
+			Usage:       "send http POST to `URL` in json format for any junit test extracted from junit XMLs within the results dir. To disable - set this flag to 'null'",
 			Destination: &publishTestCasesTo,
 		},
 		cli.StringFlag{
@@ -77,7 +72,7 @@ func main() {
 		},
 		cli.BoolFlag{
 			Name:        "skipEvents, s",
-			Usage:       "do not register to docker 'die' events (default is false - hence by default we do register to events)",
+			Usage:       "do not register to docker 'die' events (default is false - by default we register to events and collect results for any stopped or killed test container)",
 			Destination: &skipEvents,
 		},
 	}
@@ -93,6 +88,10 @@ func main() {
 }
 
 func start(c *cli.Context) error {
+
+	if (outputDir == "/dev/null") && (!strings.EqualFold(publishTestCasesTo, "null") || !strings.EqualFold(publishTarGzTo, "null")) {
+		return errors.New("outputDir cannot be /dev/null when publishTestCasesTo or publishTarGzTo are in use.")
+	}
 
 	logger.Info("tugbot-collect is going to run with this configuration:")
 	logger.Info("scanOnStartup: ", scanOnStartup)

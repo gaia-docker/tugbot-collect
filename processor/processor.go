@@ -201,7 +201,7 @@ func writeToDisk(outputDir, contId string, contResults *results) (outDirFullPath
 
 func (p Processor) publishTestCases(outDirFullPath string, contId string, contResults *results) (err error) {
 
-	if p.publishTestCasesTo == "null" || p.publishTestCasesTo == "NULL" {
+	if strings.EqualFold(p.publishTestCasesTo,"null") {
 		logger.Info("publishTastCasesTo is ", p.publishTestCasesTo, ", skip sending json results")
 		return nil
 	}
@@ -303,7 +303,7 @@ func (p Processor) publishTestCases(outDirFullPath string, contId string, contRe
 
 func (p Processor) publishTarGz(outDirFullPath string) (err error) {
 
-	if p.publishTarGzTo == "null" || p.publishTarGzTo == "NULL" {
+	if strings.EqualFold(p.publishTarGzTo,"null") {
 		logger.Info("publishTarGzTo is ", p.publishTarGzTo, ", skip sending tar.gz results")
 		return nil
 	}
