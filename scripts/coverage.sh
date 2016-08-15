@@ -4,7 +4,7 @@
 # Works around the fact that `go test -coverprofile` currently does not work
 # with multiple packages, see https://code.google.com/p/go/issues/detail?id=6909
 #
-# Usage: script/coverage [--html]
+# Usage: scripts/coverage [--html]
 #
 #     --html  Additionally create HTML report and open it in browser
 #
