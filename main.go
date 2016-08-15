@@ -140,7 +140,7 @@ func start(c *cli.Context) error {
 	}
 
 	if !skipEvents {
-		eventlistener.Register(dockerClient, matchLabel, p.Tasks)
+		eventlistener.NewEventListener(dockerClient, matchLabel, p.Tasks).Register()
 	}
 
 	// The program will wait here until it gets the
