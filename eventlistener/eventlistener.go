@@ -17,18 +17,16 @@ type RegisterToEvents interface {
 }
 
 type eventListener struct {
-	dockerClient *client.Client
+	dockerClient client.SystemAPIClient
 	matchLabel   string
 	tasks        chan string
-	monitor      func(ctx context.Context, cli client.SystemAPIClient, options types.EventsOptions, handler *events.Handler) chan error
 }
 
-func NewEventListener(dockerClient *client.Client, matchLabel string, tasks chan string) RegisterToEvents {
+func NewEventListener(dockerClient client.SystemAPIClient, matchLabel string, tasks chan string) RegisterToEvents {
 	return &eventListener{
 		dockerClient: dockerClient,
 		matchLabel:   matchLabel,
 		tasks:        tasks,
-		monitor:      events.MonitorWithHandler,
 	}
 }
 
@@ -52,7 +50,7 @@ func (l *eventListener) Register() {
 		options := types.EventsOptions{Filters: f}
 
 		logger.Info("start monitoring exited test containers with the maching label: ", l.matchLabel)
-		errChan := l.monitor(ctx, l.dockerClient, options, eventHandler)
+		errChan := events.MonitorWithHandler(ctx, l.dockerClient, options, eventHandler)
 
 		if err := <-errChan; err != nil {
 			logger.Error("Event monitor throw this error: ", err)
