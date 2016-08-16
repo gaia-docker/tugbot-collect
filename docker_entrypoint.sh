@@ -1,3 +1,4 @@
+#!/bin/sh
 set -e
 
 if [ "$1" = "tugbot" ]; then
