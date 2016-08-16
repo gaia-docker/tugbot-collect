@@ -18,7 +18,7 @@ test:
     # run unit tests for all packages (exl. vendor), calculate coverage and generate junit.xml reports
     - docker run --rm -e "COVERALLS_TOKEN=${COVERALLS_TOKEN}" -v "$PWD":/go/src/github.com/gaia-docker/tugbot-collect -w /go/src/github.com/gaia-docker/tugbot-collect tugbot-collect/builder scripts/coverage.sh --coveralls
     # run integration tests (no coverage)
-    - integration_tests/run_tests.sh
+    - integration-tests/run_tests.sh
   post:
     # copy test results
     - cp .cover/*_tests.xml $CIRCLE_TEST_REPORTS
