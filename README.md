@@ -5,7 +5,7 @@
 [![Docker badge](https://img.shields.io/docker/pulls/gaiadocker/tugbot-collect.svg)](https://hub.docker.com/r/gaiadocker/tugbot-collect/)
 [![Docker Image Layers](https://imagelayers.io/badge/gaiadocker/tugbot-collect:latest.svg)](https://imagelayers.io/?images=gaiadocker/tugbot-collect:latest 'Get your own badge on imagelayers.io')
 
-collects test results from test containers and save the results to disk
+collects test results from test containers, digest and send to result services or to disk.
 
 ## Usage
 Run `docker run -it -v /var/run/docker.sock:/var/run/docker.sock gaiadocker/tugbot-collect tugbot-collect -h`
