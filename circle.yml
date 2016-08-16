@@ -16,8 +16,10 @@ dependencies:
     - docker tag gaiadocker/tugbot-collect gaiadocker/tugbot-collect:$CIRCLE_BRANCH
 test:
   override:
-    # run tests for all Pumba packages (exl. vendor), calculate coverage and generate junit.xml reports
+    # run unit tests for all packages (exl. vendor), calculate coverage and generate junit.xml reports
     - docker run --rm -e "COVERALLS_TOKEN=${COVERALLS_TOKEN}" -v "$PWD":/go/src/github.com/gaia-docker/tugbot-collect -w /go/src/github.com/gaia-docker/tugbot-collect tugbot-collect/builder scripts/coverage.sh --coveralls
+    # run integration tests (no coverage)
+    - docker run --rm -v "$PWD":/go/src/github.com/gaia-docker/tugbot-collect -w /go/src/github.com/gaia-docker/tugbot-collect tugbot-collect/builder scripts/integration_tests.sh
   post:
     # copy test results
     - cp .cover/*_tests.xml $CIRCLE_TEST_REPORTS
