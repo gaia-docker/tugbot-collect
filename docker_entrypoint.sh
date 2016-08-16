@@ -1,5 +1,4 @@
-#!/bin/sh
-set -e
+et -e
 
 if [ "$1" = "tugbot" ]; then
   if [ -S /var/run/docker.sock ]; then
