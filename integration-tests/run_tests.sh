@@ -20,7 +20,7 @@ curl http://localhost:8085/get-json-results | grep TugbotData | grep NumericStat
 
 # clear mock server and start a new one
 docker stop mock-result-service 
-docker rm mock-result-service
+docker rm --force mock-result-service
 docker run -d -p 8085:8085 --name mock-result-service msoap/shell2http -port=8085 -cgi /tar-results 'cat /dev/stdin > result.tar' /get-tar-results 'cat result.tar > /dev/stdout' /json-results 'cat /dev/stdin > result.json' /get-json-results 'cat result.json > /dev/stdout'
 
 # run again the test container - to check that tugbot-collect can catch docker events
