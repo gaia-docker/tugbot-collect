@@ -37,12 +37,12 @@ GLOBAL OPTIONS:
    --version, -v                              print the version
 ```
 
-# Addtional notes
+# Additional notes
 - If you want to use tubgot-collect default settings, this should be enough:
 `docker run -d -v /var/run/docker.sock:/var/run/docker.sock gaiadocker/tugbot-collect`
 - If you want to write the results to a disk on the host, you should add volume mapping, for example:
 `docker run -d -v /var/run/docker.sock:/var/run/docker.sock -v /tmp/tugbot-collect:/tmp/tugbot-collect gaiadocker/tugbot-collect`
-- To change log level (which is debug by default), use this for exmaple: 
+- To change log level (which is debug by default), use this for example: 
 `docker run -d -v /var/run/docker.sock:/var/run/docker.sock -e TS_LOG_LEVEL=warn gaiadocker/tugbot-collect`
 - To pass flag to tugbot-collect, use this for example:
 `docker run -d -v /var/run/docker.sock:/var/run/docker.sock gaiadocker/tugbot-collect tugbot-collect -e -d`
