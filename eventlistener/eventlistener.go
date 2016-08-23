@@ -12,27 +12,9 @@ import (
 
 var logger = log.GetLogger("eventlistener")
 
-type RegisterToEvents interface {
-	Register()
-}
-
-type eventListener struct {
-	dockerClient client.SystemAPIClient
-	matchLabel   string
-	tasks        chan string
-}
-
-func NewEventListener(dockerClient client.SystemAPIClient, matchLabel string, tasks chan string) RegisterToEvents {
-	return &eventListener{
-		dockerClient: dockerClient,
-		matchLabel:   matchLabel,
-		tasks:        tasks,
-	}
-}
-
 //Register to "die" events of docker (any container that stopped, killed or exited)
 //and writing the container id of any container that has the matchLabel to the tasks channel
-func (l *eventListener) Register() {
+func Register(dockerClient client.SystemAPIClient, matchLabel string, tasks chan string) {
 	go func() {
 		ctx, cancel := context.WithCancel(context.Background())
 
@@ -41,16 +23,16 @@ func (l *eventListener) Register() {
 		eventHandler.Handle("die", func(event eventtypes.Message) {
 			logger.Info("cought event: ", event)
 			logger.Info("going to add this container to the tasks list, id: ", event.ID)
-			l.tasks <- event.ID
+			tasks <- event.ID
 		})
 
 		//filter only test containers
 		f := filters.NewArgs()
-		f.Add("label", l.matchLabel)
+		f.Add("label", matchLabel)
 		options := types.EventsOptions{Filters: f}
 
-		logger.Info("start monitoring exited test containers with the maching label: ", l.matchLabel)
-		errChan := events.MonitorWithHandler(ctx, l.dockerClient, options, eventHandler)
+		logger.Info("start monitoring exited test containers with the maching label: ", matchLabel)
+		errChan := events.MonitorWithHandler(ctx, dockerClient, options, eventHandler)
 
 		if err := <-errChan; err != nil {
 			logger.Error("Event monitor throw this error: ", err)

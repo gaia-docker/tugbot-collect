@@ -16,8 +16,8 @@ func TestEventListener(t *testing.T) {
 	const labelToMonitor = "tugbot.test"
 	tsk := make(chan string, 10)
 
-	l := NewEventListener(dockerClientMock{}, labelToMonitor, tsk)
-	l.Register()
+	//l := NewEventListener(dockerClientMock{}, labelToMonitor, tsk)
+	Register(dockerClientMock{}, labelToMonitor, tsk)
 	select {
 	case res := <-tsk:
 		fmt.Println("we recieved the die container id via the tasks chan: ", res)
