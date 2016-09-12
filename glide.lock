@@ -36,7 +36,7 @@ imports:
   subpackages:
   - github.com\docker\go-units
 - name: github.com/gaia-docker/tugbot-parse
-  version: 50243eda9084aae2bc2ff986fc5bae721e6d203c
+  version: ff56218ee26823966988bd6d576a266f5128d595
   subpackages:
   - github.com\gaia-docker\tugbot-parse
 - name: github.com/Microsoft/go-winio
