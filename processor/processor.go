@@ -20,6 +20,7 @@ import (
 var logger = log.GetLogger("processor")
 
 const resultsTarFile = "results.tar"
+const ResultsDirDefaultPath = "/var/tests/results"
 
 //Processor is a struct to hold the Tasks channel
 //You should use NewProcessor to allocate new one and the Run func to run it
@@ -132,8 +133,15 @@ func (p Processor) collectResults(ctx context.Context, contId string) (contResul
 	}
 
 	//copy the result dir from inside the container into memory
-	//The result dir will be return in tar format
+	//The result dir will be returned in tar format
 	resultDir := contResults.containerInfo.Config.Labels[p.resultsDirLabel]
+
+	//fallback to default
+	if resultDir == nil {
+		resultDir = ResultsDirDefaultPath
+		logger.Warn("could not fetch " + p.resultsDirLabel + " from the container, going to use defualt results dir location: " + resultDir)
+	}
+
 	logger.Info("going to extract results for container with id: ", contId, ", from this location inside the test container: ", resultDir)
 	contResults.testResults, contResults.testResultsPathStat, err = p.dockerClient.CopyFromContainer(ctx, contId, resultDir)
 	/*buf := new(bytes.Buffer)
