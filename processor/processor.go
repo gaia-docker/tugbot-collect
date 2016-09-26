@@ -137,7 +137,7 @@ func (p Processor) collectResults(ctx context.Context, contId string) (contResul
 	resultDir := contResults.containerInfo.Config.Labels[p.resultsDirLabel]
 
 	//fallback to default
-	if resultDir == nil {
+	if resultDir == "" {
 		resultDir = ResultsDirDefaultPath
 		logger.Warn("could not fetch " + p.resultsDirLabel + " from the container, going to use defualt results dir location: " + resultDir)
 	}
