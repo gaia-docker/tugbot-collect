@@ -38,6 +38,7 @@ type results struct {
 	testResults         io.ReadCloser
 	testResultsPathStat types.ContainerPathStat
 	containerInfo       types.ContainerJSON
+	dockerInfo          types.Info
 }
 
 type tugbotData struct {
@@ -132,6 +133,12 @@ func (p Processor) collectResults(ctx context.Context, contId string) (contResul
 		return nil, err
 	}
 
+	contResults.dockerInfo, err = p.dockerClient.Info(ctx)
+	if err != nil {
+		logger.Error("failed to get docker info")
+		return nil, err
+	}
+
 	//copy the result dir from inside the container into memory
 	//The result dir will be returned in tar format
 	resultDir := contResults.containerInfo.Config.Labels[p.resultsDirLabel]
@@ -222,7 +229,7 @@ func (p Processor) publishTestCases(outDirFullPath string, contId string, contRe
 	}
 	defer f.Close()
 
-	tugbotDt := getTugbotData(contResults.containerInfo, contId)
+	tugbotDt := getTugbotData(contResults, contId)
 	client := new(http.Client)
 	tarReader := tar.NewReader(f)
 
@@ -395,13 +402,13 @@ func addFileToTar(tw *tar.Writer, folderPath, fileName string) error {
 	return nil
 }
 
-func getTugbotData(contInfo types.ContainerJSON, contId string) *tugbotData {
+func getTugbotData(contResults *results, contId string) *tugbotData {
 	return &tugbotData{
-		ImageName:   contInfo.Config.Image,
+		ImageName:   contResults.containerInfo.Config.Image,
 		ContainerId: contId,
-		StartedAt:   contInfo.State.StartedAt,
-		FinishedAt:  contInfo.State.FinishedAt,
-		ExitCode:    contInfo.State.ExitCode,
-		HostName:    contInfo.Config.Hostname,
+		StartedAt:   contResults.containerInfo.State.StartedAt,
+		FinishedAt:  contResults.containerInfo.State.FinishedAt,
+		ExitCode:    contResults.containerInfo.State.ExitCode,
+		HostName:    contResults.dockerInfo.Name,
 	}
 }
