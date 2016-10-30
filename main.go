@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/docker/engine-api/client"
+	"github.com/docker/docker/client"
 	"github.com/gaia-docker/tugbot-collect/log"
 	"github.com/urfave/cli"
 	"github.com/gaia-docker/tugbot-collect/eventlistener"
@@ -87,7 +87,7 @@ func main() {
 
 }
 
-func start(c *cli.Context) error {
+func start() error {
 
 	if (outputDir == "/dev/null") && (!strings.EqualFold(publishTestCasesTo, "null") || !strings.EqualFold(publishTarGzTo, "null")) {
 		return errors.New("outputDir cannot be /dev/null when publishTestCasesTo or publishTarGzTo are in use.")
