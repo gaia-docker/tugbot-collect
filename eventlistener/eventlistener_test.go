@@ -2,12 +2,11 @@ package eventlistener
 
 import (
 	"testing"
-	"github.com/docker/engine-api/types"
+	"github.com/docker/docker/api/types"
 	"golang.org/x/net/context"
-	"io"
 	"fmt"
-	"bytes"
 	"time"
+	"github.com/docker/docker/api/types/events"
 )
 
 //We simulate docker die event and expect to get the die container id in the tasks channel
@@ -28,15 +27,12 @@ func TestEventListener(t *testing.T) {
 
 type dockerClientMock struct {}
 
-func (d dockerClientMock) Events(ctx context.Context, options types.EventsOptions) (io.ReadCloser, error) {
-	//A sample event was extracted using this code:
-	//f.Add("event", "die")
-	//options := types.EventsOptions{Filters: f}
-	//b, _ := dockerClient.Events(ctx, options)
-	//arr := make([]byte, 1024)
-	//b.Read(arr)
-	//fmt.Println(string(arr))
-	return nopCloser{bytes.NewBufferString("{\"status\":\"die\",\"id\":\"5fbe2d71593def3b1ac43fbdebfaa42528fa5f857415bd25af64bf61aed22b79\",\"from\":\"hello-world\",\"Type\":\"container\",\"Action\":\"die\",\"Actor\":{\"ID\":\"5fbe2d71593def3b1ac43fbdebfaa42528fa5f857415bd25af64bf61aed22b79\",\"Attributes\":{\"exitCode\":\"0\",\"image\":\"hello-world\",\"name\":\"serene_borg\"}},\"time\":1471266369,\"timeNano\":1471266369413735698}")}, nil
+func (d dockerClientMock) Events(ctx context.Context, options types.EventsOptions) (<-chan events.Message, <-chan error) {
+	eventsChan := make(chan events.Message, 10)
+	errChan := make(chan error, 10)
+	event := events.Message{ Type: "container", Action: "die", }
+	eventsChan <- event
+	return eventsChan, errChan
 }
 func (d dockerClientMock) Info(ctx context.Context) (types.Info, error) {
 	panic("This function not suppose to be called")
@@ -45,12 +41,10 @@ func (d dockerClientMock) RegistryLogin(ctx context.Context, auth types.AuthConf
 	panic("This function not suppose to be called")
 }
 
-//struct to fit the io.ReadCloser interface
-type nopCloser struct {
-	io.Reader
-}
-func (nopCloser) Close() error {
-	return nil
+func (d dockerClientMock) DiskUsage(ctx context.Context) (types.DiskUsage, error) {
+	panic("This function not suppose to be called")
 }
 
-
+func (d dockerClientMock) Ping(ctx context.Context) (bool, error) {
+	panic("This function not suppose to be called")
+}

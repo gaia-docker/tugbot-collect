@@ -5,8 +5,8 @@ import (
 	"bytes"
 	"compress/gzip"
 	"encoding/json"
-	"github.com/docker/engine-api/client"
-	"github.com/docker/engine-api/types"
+	"github.com/docker/docker/client"
+	"github.com/docker/docker/api/types"
 	"github.com/gaia-docker/tugbot-collect/log"
 	"github.com/gaia-docker/tugbot-parse"
 	"golang.org/x/net/context"
@@ -230,7 +230,7 @@ func (p Processor) publishTestCases(outDirFullPath string, contId string, contRe
 	defer f.Close()
 
 	tugbotDt := getTugbotData(contResults, contId)
-	client := new(http.Client)
+	httpClient := new(http.Client)
 	tarReader := tar.NewReader(f)
 
 	i := 0
@@ -274,7 +274,7 @@ func (p Processor) publishTestCases(outDirFullPath string, contId string, contRe
 				}
 
 				for _, test := range tests {
-					json, err := json.Marshal(struct {
+					testInJson, err := json.Marshal(struct {
 						TugbotData *tugbotData
 						Test       parse.AnalyticsTest
 					}{
@@ -287,12 +287,12 @@ func (p Processor) publishTestCases(outDirFullPath string, contId string, contRe
 						continue
 					}
 
-					logger.Debug("json for file: ", name, ", is: ", string(json))
+					logger.Debug("json for file: ", name, ", is: ", string(testInJson))
 
-					r := bytes.NewReader(json)
+					r := bytes.NewReader(testInJson)
 					request, err := http.NewRequest("POST", p.publishTestCasesTo+"?docker.imagename="+contResults.containerInfo.Config.Image, r)
 					request.Header.Add("Content-Type", "application/json")
-					_, err = client.Do(request)
+					_, err = httpClient.Do(request)
 					if err != nil {
 						logger.Error("error publish json: ", err)
 						return err
@@ -332,10 +332,10 @@ func (p Processor) publishTarGz(outDirFullPath string) (err error) {
 	}
 	defer f.Close()
 
-	client := new(http.Client)
+	httpClient := new(http.Client)
 	request, err := http.NewRequest("POST", p.publishTarGzTo+"?mainfile="+resultsTarFile, f)
 	request.Header.Add("Content-Type", "application/gzip")
-	_, err = client.Do(request)
+	_, err = httpClient.Do(request)
 	if err != nil {
 		logger.Error("error uploading file: ", err)
 		return err

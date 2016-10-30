@@ -1,4 +1,4 @@
-FROM golang:1.6.2-alpine
+FROM golang:1.7.3-alpine
 
 MAINTAINER Shay Tsadok <shayts7@gmail.com>
 
@@ -13,7 +13,7 @@ RUN apk --update add git bash \
     && rm /var/cache/apk/*
 
 # install glide package manager
-RUN curl -Ls https://github.com/Masterminds/glide/releases/download/0.10.2/glide-0.10.2-linux-amd64.tar.gz | tar xz -C /tmp \
+RUN curl -Ls https://github.com/Masterminds/glide/releases/download/v0.12.3/glide-v0.12.3-windows-amd64.tar.gz | tar xz -C /tmp \
  && mv /tmp/linux-amd64/glide /usr/bin/
 
 # goveralls - Go integration for Coveralls.io

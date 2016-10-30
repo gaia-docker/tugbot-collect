@@ -3,12 +3,12 @@ package scanner
 import (
 	"testing"
 	"golang.org/x/net/context"
-	"github.com/docker/engine-api/types"
+	"github.com/docker/docker/api/types"
 	"fmt"
 	"time"
 	"io"
-	"github.com/docker/engine-api/types/container"
-	"github.com/docker/engine-api/types/network"
+	"github.com/docker/docker/api/types/container"
+	"github.com/docker/docker/api/types/network"
 	"errors"
 )
 
@@ -31,8 +31,7 @@ type dockerClientMock struct {}
 
 func (d dockerClientMock) ContainerList(ctx context.Context, options types.ContainerListOptions) ([]types.Container, error) {
 	if options.Filter.Get("status")[0] == "exited" && options.Filter.Get("label")[0] == labelToScan {
-		conts := []types.Container {
-			types.Container{ ID: "123456", Names: []string {"MockContainer"} },
+		conts := []types.Container { { ID: "123456", Names: []string {"MockContainer"} },
 		}
 		return conts, nil
 	}
@@ -100,7 +99,7 @@ func (d dockerClientMock) ContainerRestart(ctx context.Context, container string
 func (d dockerClientMock) ContainerStatPath(ctx context.Context, container, path string) (types.ContainerPathStat, error)  {
 	panic("This function not suppose to be called")
 }
-func (d dockerClientMock) ContainerStats(ctx context.Context, container string, stream bool) (io.ReadCloser, error)  {
+func (d dockerClientMock) ContainerStats(ctx context.Context, container string, stream bool) (types.ContainerStats, error)  {
 	panic("This function not suppose to be called")
 }
 func (d dockerClientMock) ContainerStart(ctx context.Context, container string, options types.ContainerStartOptions) error  {
@@ -115,7 +114,7 @@ func (d dockerClientMock) ContainerTop(ctx context.Context, container string, ar
 func (d dockerClientMock) ContainerUnpause(ctx context.Context, container string) error  {
 	panic("This function not suppose to be called")
 }
-func (d dockerClientMock)ContainerUpdate(ctx context.Context, container string, updateConfig container.UpdateConfig) error  {
+func (d dockerClientMock)ContainerUpdate(ctx context.Context, container string, updateConfig container.UpdateConfig) (types.ContainerUpdateResponse, error)  {
 	panic("This function not suppose to be called")
 }
 func (d dockerClientMock) ContainerWait(ctx context.Context, container string) (int, error)  {
@@ -125,5 +124,9 @@ func (d dockerClientMock) CopyFromContainer(ctx context.Context, container, srcP
 	panic("This function not suppose to be called")
 }
 func (d dockerClientMock) CopyToContainer(ctx context.Context, container, path string, content io.Reader, options types.CopyToContainerOptions) error  {
+	panic("This function not suppose to be called")
+}
+
+func (d dockerClientMock) ContainersPrune(ctx context.Context, cfg types.ContainersPruneConfig) (types.ContainersPruneReport, error) {
 	panic("This function not suppose to be called")
 }
