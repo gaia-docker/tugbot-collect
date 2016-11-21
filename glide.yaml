@@ -2,13 +2,12 @@ package: github.com/gaia-docker/tugbot-collect
 import:
 - package: github.com/Sirupsen/logrus
 - package: github.com/docker/docker
-  version: master
   subpackages:
   - api/types
-  - api/types/events
   - api/types/filters
   - client
-  - daemon/events
 - package: github.com/gaia-docker/tugbot-parse
 - package: github.com/urfave/cli
-- package: github.com/vdemeester/docker-events
+- package: golang.org/x/net
+  subpackages:
+  - context

@@ -1,17 +1,11 @@
-hash: 5d33af3f4192d01fad11b7bc99b41e11b7d2273d3d232c49282676d929d3bbdd
-updated: 2016-10-30T14:43:06.961117103Z
+hash: 99d29a4826bef20f414505d03faf1e925d7ebe1fa83e290496f0c6fa84e37f11
+updated: 2016-10-30T20:01:32.835495068Z
 imports:
-- name: github.com/beorn7/perks
-  version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
-  subpackages:
-  - quantile
 - name: github.com/docker/distribution
   version: 994d1a56ffbfabfaf7925ac732aeeb976c5bc06f
   subpackages:
-  - context
   - digest
   - reference
-  - uuid
 - name: github.com/docker/docker
   version: 17aaa0890a7f53cbd9c8806a93de73898ea92813
   subpackages:
@@ -29,110 +23,29 @@ imports:
   - api/types/time
   - api/types/versions
   - client
-  - daemon/events
-  - daemon/graphdriver
-  - image
-  - image/v1
-  - layer
-  - pkg/archive
-  - pkg/chrootarchive
-  - pkg/fileutils
-  - pkg/idtools
-  - pkg/ioutils
-  - pkg/longpath
-  - pkg/mount
-  - pkg/plugingetter
-  - pkg/plugins
-  - pkg/plugins/transport
-  - pkg/pools
-  - pkg/promise
-  - pkg/pubsub
-  - pkg/random
-  - pkg/reexec
-  - pkg/stringid
-  - pkg/system
   - pkg/tlsconfig
-  - reference
-- name: github.com/docker/engine-api
-  version: 4290f40c056686fcaa5c9caf02eac1dde9315adf
-  subpackages:
-  - client
-  - client/transport
-  - client/transport/cancellable
-  - types
-  - types/blkiodev
-  - types/container
-  - types/events
-  - types/filters
-  - types/mount
-  - types/network
-  - types/reference
-  - types/registry
-  - types/strslice
-  - types/swarm
-  - types/time
-  - types/versions
 - name: github.com/docker/go-connections
   version: 1494b6df4050e60923d68cd8cc6a19e7af9f1c01
   subpackages:
   - nat
   - sockets
   - tlsconfig
-- name: github.com/docker/go-metrics
-  version: 86138d05f285fd9737a99bee2d9be30866b59d72
 - name: github.com/docker/go-units
   version: 8a7beacffa3009a9ac66bad506b18ffdd110cf97
 - name: github.com/gaia-docker/tugbot-parse
   version: da9f8261e0a2f6f9aa6b668a29155b3ac65014fe
-- name: github.com/golang/protobuf
-  version: 8d92cf5fc15a4382f8964b08e1f42a75c0591aa3
-  subpackages:
-  - proto
-- name: github.com/gorilla/context
-  version: 14f550f51af52180c2eefed15e5fd18d63c0a64a
-- name: github.com/gorilla/mux
-  version: e444e69cbd2e2e3e0749a2f3c717cec491552bbf
-- name: github.com/matttproud/golang_protobuf_extensions
-  version: c12348ce28de40eed0136aa2b644d0ee0650e56c
-  subpackages:
-  - pbutil
 - name: github.com/Microsoft/go-winio
   version: ce2922f643c8fd76b46cadc7f404a06282678b34
 - name: github.com/opencontainers/runc
   version: 4c8007f34a0077a1040923ee4c7cec64b6e070d4
   subpackages:
-  - libcontainer/system
   - libcontainer/user
 - name: github.com/pkg/errors
   version: 248dadf4e9068a0b3e79f02ed0a610d935de5302
-- name: github.com/prometheus/client_golang
-  version: 3fb8ace93bc4ccddea55af62320c2fd109252880
-  subpackages:
-  - prometheus
-- name: github.com/prometheus/client_model
-  version: fa8ad6fec33561be4280a8f0514318c79d7f6cb6
-  subpackages:
-  - go
-- name: github.com/prometheus/common
-  version: 85637ea67b04b5c3bb25e671dacded2977f8f9f6
-  subpackages:
-  - expfmt
-  - internal/bitbucket.org/ww/goautoneg
-  - model
-- name: github.com/prometheus/procfs
-  version: abf152e5f3e97f2fafac028d2cc06c1feb87ffa5
 - name: github.com/Sirupsen/logrus
   version: 3ec0642a7fb6488f65b06f9040adc67e3990296a
 - name: github.com/urfave/cli
   version: 3eb41f1bb122ac7535cc7b32db6b78b541879726
-- name: github.com/vbatts/tar-split
-  version: bd4c5d64c3e9297f410025a3b1bd0c58f659e721
-  subpackages:
-  - archive/tar
-  - tar/asm
-  - tar/storage
-- name: github.com/vdemeester/docker-events
-  version: 4a83cc6dc9d599f999b62fe16bddd882ea731008
 - name: golang.org/x/net
   version: 4876518f9e71663000c348837735820161a42df7
   subpackages:
