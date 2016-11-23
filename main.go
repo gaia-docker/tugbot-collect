@@ -87,7 +87,7 @@ func main() {
 
 }
 
-func start() error {
+func start(c *cli.Context) error {
 
 	if (outputDir == "/dev/null") && (!strings.EqualFold(publishTestCasesTo, "null") || !strings.EqualFold(publishTarGzTo, "null")) {
 		return errors.New("outputDir cannot be /dev/null when publishTestCasesTo or publishTarGzTo are in use.")
