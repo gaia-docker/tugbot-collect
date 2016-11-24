@@ -14,7 +14,7 @@ docker run -d --name tugbot-collect --link mock-result-service:mock-result-servi
 
 sleep 1
 
-# check that the mock result service recieved the data
+# check that the mock result service received the data
 curl http://localhost:8085/get-tar-results | tar tvz | grep results.tar
 curl http://localhost:8085/get-json-results | grep TugbotData | grep NumericStatus
 
