@@ -36,7 +36,7 @@ ExecStartPre=-/usr/bin/docker rm tugbot-collect
 ExecStart=/usr/bin/docker run \
 --name tugbot-collect \
 -v /var/run/docker.sock:/var/run/docker.sock \
-gaiadocker/tugbot-collect:107-master tugbot-collect -g null -c ${GAIA_TUGBOT_TESTRESULTS_WEBHOOK_URL}
+gaiadocker/tugbot-collect:master tugbot-collect -g null -c ${GAIA_TUGBOT_TESTRESULTS_WEBHOOK_URL}
 
 ExecStop=/usr/bin/docker stop tugbot-collect
 
