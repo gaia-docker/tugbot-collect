@@ -5,6 +5,8 @@ machine:
     - docker
 dependencies:
   override:
+    # download update_service script
+    - curl -LO https://raw.githubusercontent.com/gaia-adm/gaia-fleet/master/update_service.sh && chmod +x update_service.sh
     # create builder image
     - docker build -t tugbot-collect/builder -f Build.Dockerfile .
     # compile tugbot-collect binary (linux/amd64)
@@ -29,6 +31,7 @@ deployment:
       # deply image to DockerHub
       - docker login -e $DOCKER_EMAIL -u $DOCKER_USER -p $DOCKER_PASS
       - docker push gaiadocker/tugbot-collect
+      - ./update_service.sh -t $CIRCLE_BRANCH -b $CIRCLE_BUILD_NUM -f tugbot-collect.service -n tugbot-collect
 #  github:
 #    branch: master
 #    commands:

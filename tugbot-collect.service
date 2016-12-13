@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 [Unit]
-Description=Tugbot collect - fetch test results from exited containers and send them over http 
+Description=Tugbot collect - fetch test results from exited containers and send them over http
 Documentation=https://github.com/gaia-docker/tugbot-collect
 
 After=docker.service
@@ -36,7 +36,7 @@ ExecStartPre=-/usr/bin/docker rm tugbot-collect
 ExecStart=/usr/bin/docker run \
 --name tugbot-collect \
 -v /var/run/docker.sock:/var/run/docker.sock \
-gaiadocker/tugbot-collect:master tugbot-collect -g null -c ${GAIA_TUGBOT_TESTRESULTS_WEBHOOK_URL}
+gaiadocker/tugbot-collect tugbot-collect -g null -c ${GAIA_TUGBOT_TESTRESULTS_WEBHOOK_URL}
 
 ExecStop=/usr/bin/docker stop tugbot-collect
 
