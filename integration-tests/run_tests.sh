@@ -4,7 +4,7 @@ set -x
 
 # running the test container - the container will exit immediately 
 # we map a volume that contains junit xml example file to be used as the results dir
-docker run -v "$PWD"/integration-tests:/tmp --label tugbot.test=true --label tugbot.results.dir=/tmp alpine /bin/sh
+docker run -v "$PWD"/integration-tests:/tmp --label tugbot-test=true --label tugbot-results-dir=/tmp alpine /bin/sh
 
 # running mock http server to simulate tar.gz result service api and json test result service api
 docker run -d -p 8085:8085 --name mock-result-service msoap/shell2http -port=8085 -cgi /tar-results 'cat /dev/stdin > result.tar' /get-tar-results 'cat result.tar > /dev/stdout' /json-results 'cat /dev/stdin > result.json' /get-json-results 'cat result.json > /dev/stdout'
@@ -24,7 +24,7 @@ docker rm --force mock-result-service
 docker run -d -p 8085:8085 --name mock-result-service msoap/shell2http -port=8085 -cgi /tar-results 'cat /dev/stdin > result.tar' /get-tar-results 'cat result.tar > /dev/stdout' /json-results 'cat /dev/stdin > result.json' /get-json-results 'cat result.json > /dev/stdout'
 
 # run again the test container - to check that tugbot-collect can catch docker events
-docker run -v "$PWD"/integration-tests:/tmp --label tugbot.test=true --label tugbot.results.dir=/tmp alpine /bin/sh
+docker run -v "$PWD"/integration-tests:/tmp --label tugbot-test=true --label tugbot-results-dir=/tmp alpine /bin/sh
 
 sleep 1
 

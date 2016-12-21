@@ -50,13 +50,13 @@ func main() {
 		},
 		cli.StringFlag{
 			Name:        "resultsDirLabel, r",
-			Value:       "tugbot.results.dir",
+			Value:       "tugbot-results-dir",
 			Usage:       "tugbot-collect will use this docker label `KEY` and fetch the label value from the test container to resolve the results dir location. If the label could not be found on the test container, the default results dir location: '" + processor.ResultsDirDefaultPath + "' will be in use",
 			Destination: &resultsDirLabel,
 		},
 		cli.StringFlag{
 			Name:        "matchLabel, m",
-			Value:       "tugbot.test",
+			Value:       "tugbot-test",
 			Usage:       "tugbot-collect will collect results from test containers matching this label `KEY`",
 			Destination: &matchLabel,
 		},

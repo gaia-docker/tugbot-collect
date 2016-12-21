@@ -12,7 +12,7 @@ import (
 	"errors"
 )
 
-const labelToScan = "tugbot.test"
+const labelToScan = "tugbot-test"
 
 func TestScanner(t *testing.T) {
 

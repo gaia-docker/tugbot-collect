@@ -12,7 +12,7 @@ import (
 //We simulate docker die event and expect to get the die container id in the tasks channel
 func TestEventListener(t *testing.T) {
 
-	const labelToMonitor = "tugbot.test"
+	const labelToMonitor = "tugbot-test"
 	tsk := make(chan string, 10)
 
 	//l := NewEventListener(dockerClientMock{}, labelToMonitor, tsk)
